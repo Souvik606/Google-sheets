@@ -24,6 +24,7 @@ export const createSession = async (user_id, access_token, refresh_token) => {
     `;
     return session[0];
   } catch (err) {
+    console.error("Session error ",err);
     throw new Error(err);
   }
 };

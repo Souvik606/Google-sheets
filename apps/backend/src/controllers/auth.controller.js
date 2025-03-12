@@ -39,20 +39,20 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 
   let user,
-    profileIconURL = "";
+    profileIcon;
 
-  const profileIconLocalPath = req?.file.path;
+  const profileIconLocalPath = req.file?.path;
 
   if (profileIconLocalPath) {
-    profileIconURL = await uploadOnCloudinary(profileIconLocalPath);
+    profileIcon = await uploadOnCloudinary(profileIconLocalPath);
   }
 
   try {
-    user = await createUser(name, email, password, profileIconURL);
+    user = await createUser(name, email, password, profileIcon?.url);
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong!"
+      "Something went wrong while registering user!"
     );
   }
 
@@ -68,6 +68,9 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   let session;
 
+  console.log(user)
+  console.log("accessToken", accessToken);
+  console.log("refreshToken", refreshToken);
   try {
     session = await createSession(user.user_id, accessToken, refreshToken);
   } catch (err) {
@@ -88,8 +91,8 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   return res
     .status(STATUS.SUCCESS.CREATED)
-    .cookies("accessToken", accessToken, cookieOptions)
-    .cookies("refreshToken", refreshToken, cookieOptions)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         { user: user, session: session },
