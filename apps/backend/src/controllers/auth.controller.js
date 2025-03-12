@@ -3,7 +3,7 @@ import { STATUS } from "../constants/statusCodes.js";
 import { ApiError } from "../utils/ApiError.js";
 import {
   createSession,
-  createUser,
+  createUser, deleteSessionById,
   deleteUserById,
   findUserbyEmail,
 } from "../database/queries/auth.queries.js";
@@ -172,5 +172,12 @@ export const loginUser = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
+  const session=await deleteSessionById(req.session.session_id);
 
+  return res.status(STATUS.SUCCESS.OK)
+    .clearCookie("accessToken",cookieOptions)
+    .clearCookie("refreshToken",cookieOptions)
+    .json(
+      new ApiResponse(session[0],"Logged out successfully")
+    );
 })

@@ -49,3 +49,26 @@ export const deleteUserById = async (user_id) => {
     throw new Error(err);
   }
 };
+
+export const findSessionByAccessToken = async (access_token) => {
+  try{
+    const session = await sql`
+    SELECT session_id FROM sessions WHERE access_token = ${access_token}
+    `
+    return session[0];
+  }
+  catch(err){
+    throw new Error(err);
+  }
+}
+
+export const deleteSessionById = async (session_id) => {
+  try{
+    return await sql`
+    DELETE FROM sessions WHERE session_id = ${session_id}
+    RETURNING session_id,user_id
+    `
+  }catch(err){
+    throw new Error(err);
+  }
+}
