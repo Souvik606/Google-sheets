@@ -14,6 +14,8 @@ import {
 } from "../utils/tokenGenerator.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { cookieOptions } from "../constants/cookieOptions.js";
+import dayjs from "dayjs";
+import bcrypt from "bcryptjs";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
@@ -38,8 +40,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(STATUS.CLIENT_ERROR.FORBIDDEN, "User already exists");
   }
 
-  let user,
-    profileIcon;
+  let user, profileIcon;
 
   const profileIconLocalPath = req.file?.path;
 
@@ -62,17 +63,20 @@ export const registerUser = asyncHandler(async (req, res) => {
       "Failed to register user"
     );
   }
+  const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+  const accessToken = generateAccessToken(user, currentTime);
+  const refreshToken = generateRefreshToken(user, currentTime);
 
   let session;
 
-  console.log(user)
-  console.log("accessToken", accessToken);
-  console.log("refreshToken", refreshToken);
   try {
-    session = await createSession(user.user_id, accessToken, refreshToken);
+    session = await createSession(
+      user.user_id,
+      accessToken,
+      refreshToken,
+      currentTime
+    );
   } catch (err) {
     await deleteUserById(user.user_id);
     throw new ApiError(
@@ -95,8 +99,78 @@ export const registerUser = asyncHandler(async (req, res) => {
     .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
-        { user: user, session: session },
+        {
+          user_id: user.user_id,
+          name: user.name,
+          email: user.email,
+          profileIcon: user.profile_icon,
+          session_id: session.session_id,
+        },
         "User and Session created successfully"
       )
     );
 });
+
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!(email && password)) {
+    throw new ApiError(
+      STATUS.CLIENT_ERROR.BAD_REQUEST,
+      "All fields are required"
+    );
+  }
+
+  const user = await findUserbyEmail(email);
+
+  if (user.length <= 0) {
+    throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Email doesn't exist");
+  }
+
+  const correctPassword = user[0].password;
+
+  const isCorrectPassword = await bcrypt.compare(password, correctPassword);
+
+  if (!isCorrectPassword) {
+    throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Invalid password");
+  }
+
+  const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
+
+  const accessToken = generateAccessToken(user, currentTime);
+  const refreshToken = generateRefreshToken(user, currentTime);
+
+  const session = await createSession(
+    user[0].user_id,
+    accessToken,
+    refreshToken,
+    currentTime
+  );
+
+  if (!session) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to create session"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
+    .json(
+      new ApiResponse(
+        {
+          user_id: user[0].user_id,
+        name: user[0].name,
+        email: user[0].email,
+        profile_icon: user[0].profile_icon,
+        session_id: session.session_id,
+      },
+  "User logged in successfully")
+    );
+});
+
+export const logoutUser = asyncHandler(async (req, res) => {
+
+})
