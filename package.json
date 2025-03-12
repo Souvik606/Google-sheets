@@ -1,24 +1,25 @@
 {
-  "name": "GoogleSheets",
+  "name": "google-sheets",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Google sheets clone project.",
   "scripts": {
-    "dev": "nodemon backend/index.js",
-    "start": "node backend/index.js"
+    "dev:frontend": "pnpm --filter frontend run dev",
+    "dev:backend": "pnpm --filter backend run dev",
+    "build:frontend": "pnpm --filter frontend run build",
+    "build:backend": "pnpm --filter backend run build",
+    "lint:frontend": "pnpm --filter frontend run lint",
+    "lint:backend": "pnpm --filter backend run lint",
+    "format:frontend": "pnpm --filter frontend run format",
+    "format:backend": "pnpm --filter backend run format",
+    "start:frontend": "pnpm --filter frontend run start",
+    "start:backend": "pnpm --filter backend run start"
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.6.2",
-  "devDependencies": {
-    "nodemon": "^3.1.9"
+  "engines": {
+    "node": ">=20.0.0"
   },
-  "dependencies": {
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2"
-  }
+  "engineStrict": true
 }
