@@ -52,8 +52,8 @@ const errorHandler = (err, _req, res, _next) => {
         err.stack
           .split("\n")
           .slice(1, 4)
-          .map((item) => item.trim()),
-      ),
+          .map((item) => item.trim())
+      )
     );
   }
 };

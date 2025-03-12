@@ -35,7 +35,7 @@ class DevApiResponse extends ApiResponse {
     data = {},
     message = "Success",
     reason = "Reason could not be found.",
-    fileStackTrace = [],
+    fileStackTrace = []
   ) {
     super(data, message);
     this.reason = reason;
