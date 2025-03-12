@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import { errorHandler } from "./utils/errorHandler.js";
 import healthCheckRoutes from "./routes/healthCheck.routes.js";
 import { CORS_ORIGIN } from "../env.js";
+import authRoutes from "./routes/auth.route.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 app.use("/api/v1/health-check", healthCheckRoutes);
+app.use("/api/v1/auth", authRoutes);
 
 app.use(errorHandler);
 
