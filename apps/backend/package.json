@@ -10,7 +10,8 @@
     "build": "echo \"Builds not configured\"",
     "start": "node index.js",
     "lint": "eslint src",
-    "format": "prettier --write \\\"src/**/*.{js,json,jsx}\\\""
+    "format": "prettier --write \\\"src/**/*.{js,json,jsx}\\\"",
+    "format:check": "prettier --check \\\"src/**/*.{js,json,jsx}\\\""
   },
   "packageManager": "pnpm@10.6.2",
   "dependencies": {
