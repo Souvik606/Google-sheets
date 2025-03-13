@@ -32,7 +32,7 @@ jspm_packages/
 .stylelintcache
 
 # dotenv environment variable files
-apps/backend/.env
+.env
 .env.development.local
 .env.test.local
 .env.production.local

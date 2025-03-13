@@ -11,6 +11,7 @@
     "lint:backend": "pnpm --filter backend run lint",
     "format:frontend": "pnpm --filter frontend run format",
     "format:backend": "pnpm --filter backend run format",
+    "format:check": "pnpm -r run format:check",
     "start:frontend": "pnpm --filter frontend run start",
     "start:backend": "pnpm --filter backend run start"
   },
