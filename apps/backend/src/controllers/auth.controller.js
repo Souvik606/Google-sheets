@@ -3,7 +3,8 @@ import { STATUS } from "../constants/statusCodes.js";
 import { ApiError } from "../utils/ApiError.js";
 import {
   createSession,
-  createUser, deleteSessionById,
+  createUser,
+  deleteSessionById,
   deleteUserById,
   findUserbyEmail,
 } from "../database/queries/auth.queries.js";
@@ -48,8 +49,10 @@ export const registerUser = asyncHandler(async (req, res) => {
     profileIcon = await uploadOnCloudinary(profileIconLocalPath);
   }
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
   try {
-    user = await createUser(name, email, password, profileIcon?.url);
+    user = await createUser(name, email, hashedPassword, profileIcon?.url);
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
@@ -103,7 +106,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           user_id: user.user_id,
           name: user.name,
           email: user.email,
-          profileIcon: user.profile_icon,
+          profile_icon: user.profile_icon,
           session_id: session.session_id,
         },
         "User and Session created successfully"
@@ -162,22 +165,22 @@ export const loginUser = asyncHandler(async (req, res) => {
       new ApiResponse(
         {
           user_id: user[0].user_id,
-        name: user[0].name,
-        email: user[0].email,
-        profile_icon: user[0].profile_icon,
-        session_id: session.session_id,
-      },
-  "User logged in successfully")
+          name: user[0].name,
+          email: user[0].email,
+          profile_icon: user[0].profile_icon,
+          session_id: session.session_id,
+        },
+        "User logged in successfully"
+      )
     );
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  const session=await deleteSessionById(req.session.session_id);
+  const session = await deleteSessionById(req.session.session_id);
 
-  return res.status(STATUS.SUCCESS.OK)
-    .clearCookie("accessToken",cookieOptions)
-    .clearCookie("refreshToken",cookieOptions)
-    .json(
-      new ApiResponse(session[0],"Logged out successfully")
-    );
-})
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
+    .json(new ApiResponse(session[0], "Logged out successfully"));
+});
