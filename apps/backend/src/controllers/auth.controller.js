@@ -104,7 +104,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           user_id: user.user_id,
           name: user.name,
           email: user.email,
-          profileIcon: user.profile_icon,
+          profile_icon: user.profile_icon,
           session_id: session.session_id,
         },
         "User and Session created successfully"
