@@ -17,23 +17,13 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { cookieOptions } from "../constants/cookieOptions.js";
 import dayjs from "dayjs";
 import bcrypt from "bcryptjs";
+import {
+  loginBodySchema,
+  registrationBodySchema,
+} from "../models/zod-schemas/authentication.schemas.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!(name && email && password)) {
-    throw new ApiError(
-      STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "All fields are required"
-    );
-  }
-
-  if (password?.length < 6) {
-    throw new ApiError(
-      STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Password should be at least 6 characters"
-    );
-  }
+  const { name, email, password } = registrationBodySchema.parse(req.body);
 
   const existedUser = await findUserbyEmail(email);
 
@@ -113,14 +103,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!(email && password)) {
-    throw new ApiError(
-      STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "All fields are required"
-    );
-  }
+  const { email, password } = loginBodySchema.parse(req.body);
 
   const user = await findUserbyEmail(email);
 

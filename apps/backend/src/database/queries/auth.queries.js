@@ -1,12 +1,12 @@
 import { sql } from "../database.js";
 
 export const createUser = async (name, email, password, profile_icon) => {
-    const user = await sql`
+  const user = await sql`
     INSERT INTO  users (name, email, password, profile_icon)
     VALUES (${name},${email},${password},${profile_icon})
     RETURNING user_id, name, email, profile_icon
     `;
-    return user[0];
+  return user[0];
 };
 
 export const createSession = async (
