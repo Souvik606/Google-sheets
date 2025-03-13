@@ -49,10 +49,8 @@ export const registerUser = asyncHandler(async (req, res) => {
     profileIcon = await uploadOnCloudinary(profileIconLocalPath);
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
   try {
-    user = await createUser(name, email, hashedPassword, profileIcon?.url);
+    user = await createUser(name, email, password, profileIcon?.url);
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
@@ -106,7 +104,7 @@ export const registerUser = asyncHandler(async (req, res) => {
           user_id: user.user_id,
           name: user.name,
           email: user.email,
-          profile_icon: user.profile_icon,
+          profileIcon: user.profile_icon,
           session_id: session.session_id,
         },
         "User and Session created successfully"

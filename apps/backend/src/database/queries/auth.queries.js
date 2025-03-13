@@ -9,7 +9,12 @@ export const createUser = async (name, email, password, profile_icon) => {
     return user[0];
 };
 
-export const createSession = async (user_id, access_token, refresh_token,session_time) => {
+export const createSession = async (
+  user_id,
+  access_token,
+  refresh_token,
+  session_time
+) => {
   try {
     const session = await sql`
     INSERT INTO sessions (user_id, access_token,refresh_token,session_created_at)
@@ -18,7 +23,7 @@ export const createSession = async (user_id, access_token, refresh_token,session
     `;
     return session[0];
   } catch (err) {
-    console.error("Session error",err);
+    console.error("Session error", err);
     throw new Error(err);
   }
 };
@@ -45,24 +50,23 @@ export const deleteUserById = async (user_id) => {
 };
 
 export const findSessionByAccessToken = async (access_token) => {
-  try{
+  try {
     const session = await sql`
     SELECT session_id FROM sessions WHERE access_token = ${access_token}
-    `
+    `;
     return session[0];
-  }
-  catch(err){
+  } catch (err) {
     throw new Error(err);
   }
-}
+};
 
 export const deleteSessionById = async (session_id) => {
-  try{
+  try {
     return await sql`
     DELETE FROM sessions WHERE session_id = ${session_id}
     RETURNING session_id,user_id
-    `
-  }catch(err){
+    `;
+  } catch (err) {
     throw new Error(err);
   }
-}
+};
