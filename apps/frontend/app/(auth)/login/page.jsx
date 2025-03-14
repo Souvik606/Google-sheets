@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { loginSchema } from "@/schemas/authSchemas";
 import Link from "next/link";
+import { loginService } from "@/services/authentication";
+import { useMutation } from "@tanstack/react-query";
 
 export default function LoginPage() {
   const form = useForm({
@@ -26,9 +28,17 @@ export default function LoginPage() {
     },
   });
 
+  const { mutate, data, isSuccess, isError, isPending, error } = useMutation({
+    mutationFn: ({ email, password }) => loginService({ email, password }),
+    mutationKey: ["userLogin"],
+    onSuccess: () => {
+      console.log("Successfully logged in!");
+    },
+    retry: false,
+  });
+
   const onSubmit = (data) => {
-    // TODO: login logic
-    console.log("Login data:", data);
+    mutate(data);
   };
 
   return (
@@ -86,6 +96,7 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </div>
+        {isError ? <p>{error}</p> : ""}
       </Card>
     </div>
   );
