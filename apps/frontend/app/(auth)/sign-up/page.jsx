@@ -14,29 +14,67 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { loginSchema } from "@/schemas/authSchemas";
+import { registerSchema } from "@/schemas/authSchemas";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const form = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
+      image: null,
+      name: "",
       email: "",
       password: "",
     },
   });
 
   const onSubmit = (data) => {
-    // TODO: login logic
-    console.log("Login data:", data);
+    // TODO: signup logic
+    console.log("Sign up data:", data);
   };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 bg-gradient-to-br from-purple-100 to-teal-200">
       <Card className="w-full max-w-md p-8">
-        <h2 className="mb-6 text-center text-2xl font-bold">Login</h2>
+        <h2 className="mb-6 text-center text-2xl font-bold">Sign Up</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="image"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Profile Image</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="file"
+                      // Pass the FileList to the form field
+                      onChange={(e) => field.onChange(e.target.files)}
+                      accept="image/*"
+                      className="file:rounded file:border file:border-gray-300 file:bg-gray-100 file:px-1"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your name"
+                      {...field}
+                      autoComplete="name"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
@@ -45,7 +83,7 @@ export default function LoginPage() {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="you@example.com"
+                      placeholder="Enter your email"
                       {...field}
                       autoComplete="email"
                     />
@@ -65,7 +103,7 @@ export default function LoginPage() {
                       type="password"
                       placeholder="Enter your password"
                       {...field}
-                      autoComplete="current-password"
+                      autoComplete="new-password"
                     />
                   </FormControl>
                   <FormMessage />
@@ -73,17 +111,17 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full">
-              Log In
+              Sign Up
             </Button>
           </form>
         </Form>
         <div className="flex flex-col items-center">
-          <p className="text-sm text-gray-500">Don&apos;t have an account?</p>
+          <p className="text-sm text-gray-500">Already have an account?</p>
           <Link
-            href="/sign-up"
+            href="/login"
             className="text-sm font-semibold text-gray-500 hover:text-gray-900"
           >
-            Sign Up
+            Log In
           </Link>
         </div>
       </Card>
