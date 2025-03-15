@@ -52,7 +52,7 @@ export const deleteUserById = async (user_id) => {
 export const findSessionByAccessToken = async (access_token) => {
   try {
     const session = await sql`
-    SELECT session_id FROM sessions WHERE access_token = ${access_token}
+    SELECT session_id,user_id FROM sessions WHERE access_token = ${access_token}
     `;
     return session[0];
   } catch (err) {

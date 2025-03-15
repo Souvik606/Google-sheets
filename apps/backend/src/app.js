@@ -5,6 +5,7 @@ import { errorHandler } from "./utils/errorHandler.js";
 import healthCheckRoutes from "./routes/healthCheck.routes.js";
 import { CORS_ORIGIN } from "../env.js";
 import authRoutes from "./routes/auth.routes.js";
+import spreadsheetRoutes from "./routes/spreadsheet.routes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use("/api/v1/health-check", healthCheckRoutes);
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/spreadsheet", spreadsheetRoutes);
 
 app.use(errorHandler);
 
