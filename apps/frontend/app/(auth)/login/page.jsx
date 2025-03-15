@@ -19,7 +19,7 @@ import Link from "next/link";
 import { loginService } from "@/services/authentication";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { CircleCheckIcon } from "lucide-react";
+import { CircleAlertIcon, CircleCheckIcon } from "lucide-react";
 
 export default function LoginPage() {
   const form = useForm({
@@ -40,6 +40,12 @@ export default function LoginPage() {
         dismissible: true,
       });
       // redirect("/");
+    },
+    onError: (err) => {
+      toast(err.message, {
+        icon: <CircleAlertIcon className="text-rose-500" />,
+        dismissible: true,
+      });
     },
     retry: false,
   });
