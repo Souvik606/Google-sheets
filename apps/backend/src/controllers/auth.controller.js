@@ -46,7 +46,8 @@ export const registerUser = asyncHandler(async (req, res) => {
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while registering user!"
+      "Something went wrong while registering user",
+      err
     );
   }
 
@@ -74,7 +75,8 @@ export const registerUser = asyncHandler(async (req, res) => {
     await deleteUserById(user.user_id);
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while creating session!"
+      "Something went wrong while creating session!",
+      err
     );
   }
 

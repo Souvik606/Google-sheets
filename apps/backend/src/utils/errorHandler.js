@@ -14,6 +14,7 @@ const isProduction = process.env.NODE_ENV === "production";
  * @returns {import("express").Response} - JSON response containing error details.
  */
 const errorHandler = (err, _req, res, _next) => {
+  void _next;
   const statusCode =
     err.statusCode || STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR;
   const message = err.message || "Internal Server Error.";

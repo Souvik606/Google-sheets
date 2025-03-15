@@ -36,7 +36,8 @@ export const createSpreadsheet = asyncHandler(async (req, res) => {
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while creating spreadsheet"
+      "Something went wrong while creating spreadsheet",
+      err
     );
   }
 
@@ -69,7 +70,8 @@ export const updateSpreadsheetAccess = asyncHandler(async (req, res) => {
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while updating access"
+      "Something went wrong while updating access",
+      err
     );
   }
 
@@ -110,10 +112,10 @@ export const updateSpreadsheetName = asyncHandler(async (req, res) => {
   try {
     spreadsheet = await renameSpreadsheet(spreadsheetId, name, currentTime);
   } catch (err) {
-    console.log(err);
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while renaming spreadsheet"
+      "Something went wrong while renaming spreadsheet",
+      err
     );
   }
 
@@ -161,7 +163,8 @@ export const updateSpreadsheetDescription = asyncHandler(async (req, res) => {
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while renaming spreadsheet"
+      "Something went wrong while renaming spreadsheet",
+      err
     );
   }
 
@@ -191,7 +194,8 @@ export const getSpreadsheets = asyncHandler(async (req, res) => {
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while getting spreadsheets"
+      "Something went wrong while getting spreadsheets",
+      err
     );
   }
 
