@@ -38,13 +38,13 @@ export default function SignUpPage() {
     mutationKey: ["userSignup"],
     onSuccess: (res) => {
       console.log(res);
-      toast("Success", {
+      toast(res.message, {
         icon: <CircleCheckIcon className="text-emerald-500" />,
       });
     },
     onError: (err) => {
       console.log(err);
-      toast(err.message, {
+      toast(err.response ? err.response.data.message : err.message, {
         icon: <CircleAlertIcon className="text-rose-500" />,
       });
     },

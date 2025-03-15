@@ -42,7 +42,7 @@ export default function LoginPage() {
       // redirect("/");
     },
     onError: (err) => {
-      toast(err.message, {
+      toast(err.response ? err.response.data.message : err.message, {
         icon: <CircleAlertIcon className="text-rose-500" />,
         dismissible: true,
       });
