@@ -1,6 +1,6 @@
 import { STATUS } from "../constants/statusCodes.js";
 import { ZodError } from "zod";
-import { ApiResponse, DevApiResponse } from "./apiResponse.js";
+import { ApiResponse, DevApiResponse } from "./ApiResponse.js";
 
 const isProduction = process.env.NODE_ENV === "production";
 
