@@ -9,7 +9,9 @@ import { ApiError } from "../utils/ApiError.js";
 import { STATUS } from "../constants/statusCodes.js";
 import {
   addSpreadsheet,
+  editSpreadsheetDescription,
   findSpreadsheetById,
+  getAllSpreadsheets,
   renameSpreadsheet,
   updateUserAccess,
 } from "../database/queries/spreadsheet.queries.js";
@@ -18,7 +20,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 export const createSpreadsheet = asyncHandler(async (req, res) => {
   const session = req.session;
-  console.log(session);
   const { name, description } = spreadSheetBodySchema.parse(req.body);
 
   const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
@@ -90,6 +91,10 @@ export const updateSpreadsheetName = asyncHandler(async (req, res) => {
   const spreadsheetId = req.params.spreadsheetId;
   const session = req.session;
 
+  if (session.user_id !== req.ownerId) {
+    throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Unauthorized access");
+  }
+
   const existingSpreadsheet = await findSpreadsheetById(spreadsheetId);
 
   if (existingSpreadsheet.length <= 0) {
@@ -103,13 +108,9 @@ export const updateSpreadsheetName = asyncHandler(async (req, res) => {
   const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
   try {
-    spreadsheet = await renameSpreadsheet(
-      spreadSheetId,
-      name,
-      session.user_id,
-      currentTime
-    );
+    spreadsheet = await renameSpreadsheet(spreadsheetId, name, currentTime);
   } catch (err) {
+    console.log(err);
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
       "Something went wrong while renaming spreadsheet"
@@ -131,8 +132,13 @@ export const updateSpreadsheetName = asyncHandler(async (req, res) => {
 export const updateSpreadsheetDescription = asyncHandler(async (req, res) => {
   const { description } = spreadSheetDescriptionBodySchema.parse(req.body);
 
-  const spreadsheetId = req.params.spreadsheetId;
   const session = req.session;
+
+  if (session.user_id !== req.ownerId) {
+    throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Unauthorized access");
+  }
+
+  const spreadsheetId = req.params.spreadsheetId;
 
   const existingSpreadsheet = await findSpreadsheetById(spreadsheetId);
 
@@ -147,10 +153,9 @@ export const updateSpreadsheetDescription = asyncHandler(async (req, res) => {
   const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
   try {
-    spreadsheet = await renameSpreadsheet(
-      spreadSheetId,
+    spreadsheet = await editSpreadsheetDescription(
+      spreadsheetId,
       description,
-      session.user_id,
       currentTime
     );
   } catch (err) {
@@ -175,4 +180,29 @@ export const updateSpreadsheetDescription = asyncHandler(async (req, res) => {
         "Successfully changed spreadsheet description"
       )
     );
+});
+
+export const getSpreadsheets = asyncHandler(async (req, res) => {
+  const session = req.session;
+  let spreadsheets;
+
+  try {
+    spreadsheets = await getAllSpreadsheets(session.user_id);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while getting spreadsheets"
+    );
+  }
+
+  if (!spreadsheets) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to get spreadsheets"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(spreadsheets, "Successfully fetched spreadsheets"));
 });

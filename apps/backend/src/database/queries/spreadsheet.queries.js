@@ -19,33 +19,28 @@ export const findSpreadsheetById = async (spreadsheetId) => {
   }
 };
 
-export const renameSpreadsheet = async (
-  spreadsheetId,
-  newName,
-  userId,
-  timestamp
-) => {
+export const renameSpreadsheet = async (spreadsheetId, newName, timestamp) => {
   try {
     const spreadsheet = await sql`
-    UPDATE spreadsheets SET new_name = ${newName},last_edited_at = ${timestamp},last_edited_id = ${userId};
+    UPDATE spreadsheets SET spreadsheet_name = ${newName},last_edited_at = ${timestamp}
     WHERE spreadsheet_id = ${spreadsheetId}
     RETURNING *
     `;
     return spreadsheet[0];
   } catch (err) {
     console.log(err);
+    throw err;
   }
 };
 
 export const editSpreadsheetDescription = async (
   spreadsheetId,
   newDescription,
-  userId,
   timestamp
 ) => {
   try {
     const spreadsheet = await sql`
-    UPDATE spreadsheets SET description = ${newDescription},last_edited_at = ${timestamp},last_edited_id = ${userId};
+    UPDATE spreadsheets SET description = ${newDescription},last_edited_at = ${timestamp}
     WHERE spreadsheet_id = ${spreadsheetId}
     RETURNING *
     `;
@@ -96,5 +91,20 @@ export const updateUserAccess = async (spreadsheetId, usersArray) => {
   } catch (err) {
     console.log("Error updating user access:", err);
     throw err; // Rethrow error for proper handling
+  }
+};
+
+export const getAllSpreadsheets = async (userId) => {
+  try {
+    return await sql`
+    SELECT * from spreadsheets where owner_id = ${userId}
+    UNION
+    SELECT s.* from spreadsheets s,sheet_access sa
+    WHERE sa.user_id = ${userId}
+    AND sa.sheet_id=s.spreadsheet_id;
+    `;
+  } catch (err) {
+    console.log(err);
+    throw err;
   }
 };
