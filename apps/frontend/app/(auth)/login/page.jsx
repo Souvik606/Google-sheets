@@ -103,7 +103,6 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </div>
-        {isError ? <p>{error.toString()}</p> : ""}
       </Card>
     </div>
   );
