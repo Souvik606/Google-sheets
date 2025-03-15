@@ -16,21 +16,42 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { registerSchema } from "@/schemas/authSchemas";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
+import { signupService } from "@/services/authentication";
+import { toast } from "sonner";
+import { CircleAlertIcon, CircleCheckIcon } from "lucide-react";
 
 export default function SignUpPage() {
   const form = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      image: null,
+      profileIcon: null,
       name: "",
       email: "",
       password: "",
     },
   });
 
+  const { mutate, data, isSuccess, isError, isPending } = useMutation({
+    mutationFn: ({ profileIcon, name, email, password }) =>
+      signupService({ profileIcon, name, email, password }),
+    mutationKey: ["userSignup"],
+    onSuccess: (res) => {
+      console.log(res);
+      toast("Success", {
+        icon: <CircleCheckIcon className="text-emerald-500" />,
+      });
+    },
+    onError: (err) => {
+      console.log(err);
+      toast(err.message, {
+        icon: <CircleAlertIcon className="text-rose-500" />,
+      });
+    },
+  });
+
   const onSubmit = (data) => {
-    // TODO: signup logic
-    console.log("Sign up data:", data);
+    mutate(data);
   };
 
   return (
@@ -41,7 +62,7 @@ export default function SignUpPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="image"
+              name="profileIcon"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Profile Image</FormLabel>
@@ -111,7 +132,7 @@ export default function SignUpPage() {
               )}
             />
             <Button type="submit" className="w-full">
-              Sign Up
+              {isPending ? "Pending..." : "Sign Up"}
             </Button>
           </form>
         </Form>

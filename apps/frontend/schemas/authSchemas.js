@@ -8,7 +8,7 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  image: z.preprocess((file) => {
+  profileIcon: z.preprocess((file) => {
     if (file instanceof FileList && file.length > 0) return file.item(0);
     return undefined;
   }, z.instanceof(File).optional()),

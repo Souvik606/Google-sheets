@@ -18,6 +18,8 @@ import { loginSchema } from "@/schemas/authSchemas";
 import Link from "next/link";
 import { loginService } from "@/services/authentication";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { CircleCheckIcon } from "lucide-react";
 
 export default function LoginPage() {
   const form = useForm({
@@ -31,8 +33,13 @@ export default function LoginPage() {
   const { mutate, data, isSuccess, isError, isPending, error } = useMutation({
     mutationFn: ({ email, password }) => loginService({ email, password }),
     mutationKey: ["userLogin"],
-    onSuccess: () => {
-      console.log("Successfully logged in!");
+    onSuccess: (res) => {
+      console.log(res);
+      toast(res.message, {
+        icon: <CircleCheckIcon className="text-emerald-500" />,
+        dismissible: true,
+      });
+      // redirect("/");
     },
     retry: false,
   });
@@ -55,7 +62,7 @@ export default function LoginPage() {
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="you@example.com"
+                      placeholder="Enter your email"
                       {...field}
                       autoComplete="email"
                     />
@@ -83,7 +90,7 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full">
-              Log In
+              {isPending ? "Pending..." : "Log In"}
             </Button>
           </form>
         </Form>
@@ -96,7 +103,7 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </div>
-        {isError ? <p>{error}</p> : ""}
+        {isError ? <p>{error.toString()}</p> : ""}
       </Card>
     </div>
   );
