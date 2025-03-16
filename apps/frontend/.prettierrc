@@ -3,7 +3,10 @@
   "bracketSpacing": true,
   "tabWidth": 2,
   "trailingComma": "es5",
+  "jsxSingleQuote": false,
+  "arrowParens": "always",
   "semi": true,
   "useTabs": false,
-  "endOfLine": "crlf"
+  "endOfLine": "crlf",
+  "plugins": ["prettier-plugin-tailwindcss"]
 }
