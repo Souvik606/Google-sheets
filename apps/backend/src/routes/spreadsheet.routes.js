@@ -23,4 +23,5 @@ router
   .route("/:spreadsheetId/edit-description")
   .patch(verifyJWT, verifyOwner, updateSpreadsheetDescription);
 
+router.route("/:spreadsheetId/sheet/create");
 export default router;

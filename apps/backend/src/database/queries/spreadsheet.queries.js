@@ -108,3 +108,16 @@ export const getAllSpreadsheets = async (userId) => {
     throw err;
   }
 };
+
+export const findAllUsers = async (spreadsheetId) => {
+  try {
+    return await sql`
+    SELECT owner_id as user_id,'editor' as role from spreadsheets WHERE spreadsheet_id = ${spreadsheetId}
+    UNION
+    SELECT user_id,role from Sheet_access WHERE sheet_id = ${spreadsheetId}
+    `;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
