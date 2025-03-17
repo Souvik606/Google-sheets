@@ -34,3 +34,11 @@ export const createComments = async (sheetId, userId, content, timestamp) => {
     `;
   return comment[0];
 };
+
+export const fetchComments = async (spreadsheetId) => {
+  return sql`
+    SELECT C.*,U.name,S.sheet_name FROM comments C,users U,sheets S
+    WHERE S.spreadsheet_id = ${spreadsheetId}
+    AND C.sheet_id=S.sheet_id
+    AND C.commenter_id=U.user_id`;
+};

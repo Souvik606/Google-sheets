@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js";
 import {
   addSheets,
   createComments,
+  fetchComments,
   findSheetById,
   renameSheets,
 } from "../database/queries/sheet.queries.js";
@@ -157,4 +158,42 @@ export const postComment = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.CREATED)
     .json(new ApiResponse(comment, "Comment posted successfully."));
+});
+
+export const getAllComments = asyncHandler(async (req, res) => {
+  const users = req.users;
+  const spreadsheetId = req.params.spreadsheetId;
+  const userId = req.session.user_id;
+
+  const user = users.find((u) => u.user_id === userId);
+
+  if (!user) {
+    throw new ApiError(
+      STATUS.CLIENT_ERROR.FORBIDDEN,
+      "User don't have access to the spreadsheet"
+    );
+  }
+
+  let comments;
+
+  try {
+    comments = await fetchComments(spreadsheetId);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while fetching comments",
+      err
+    );
+  }
+
+  if (!comments) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to fetch comments"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(comments, "Comments fetched successfully"));
 });
