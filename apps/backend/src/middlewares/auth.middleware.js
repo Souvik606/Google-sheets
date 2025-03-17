@@ -30,7 +30,8 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
   } catch (err) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.UNAUTHORIZED,
-      err.message || "Invalid access token"
+      err.message || "Invalid access token",
+      err
     );
   }
 });
