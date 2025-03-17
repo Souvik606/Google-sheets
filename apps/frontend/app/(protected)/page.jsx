@@ -2,8 +2,23 @@ import Navbar from "@/components/Navbar";
 import React from "react";
 import { PlusIcon } from "lucide-react";
 
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const tableData = [
   {
@@ -21,7 +36,7 @@ const tableData = [
       },
       {
         name: "Mini Project_6th_sem_2024",
-        ownedBy: "Ankita Das",
+        ownedBy: "Ninja Hattori",
         lastOpened: "Mar 16, 2025",
       },
     ],
@@ -46,7 +61,7 @@ const tableData = [
     items: [
       {
         name: "Due of post Boarders (Mess)_2022",
-        ownedBy: "Raushan Kumar",
+        ownedBy: "Arnab",
         lastOpened: "Jan 16, 2025",
       },
       {
@@ -84,29 +99,48 @@ export default function Home() {
       </section>
 
       <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
-        <div className="space-y-8">
-          {tableData.map((section) => (
-            <div key={section.groupName} className="space-y-2">
-              {/* Section Heading (e.g. “Yesterday”, “Previous 30 days”) */}
-              <h2 className="text-lg font-semibold text-gray-600 uppercase">
-                {section.groupName}
-              </h2>
-
-              {/* Table for this section */}
-              <Table>
-                <TableBody>
-                  {section.items.map((item) => (
-                    <TableRow key={item.name}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.ownedBy}</TableCell>
-                      <TableCell>{item.lastOpened}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ))}
+        <div className="flex items-center justify-between">
+          <h2 className={"text-lg font-semibold text-gray-600"}>My sheets</h2>
+          <div></div>
         </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-1/2">Name</TableHead>
+              <TableHead>
+                <Select>
+                  <SelectTrigger
+                    size={"default"}
+                    className={
+                      "cursor-pointer border-none p-0 shadow-none focus:border-none focus:outline-none focus-visible:shadow-none focus-visible:ring-0"
+                    }
+                  >
+                    <SelectValue placeholder="Owned by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="anyone">Owned by anyone</SelectItem>
+                      <SelectItem value="me">Owned by me</SelectItem>
+                      <SelectItem value="not-me">Not owned by me</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </TableHead>
+              <TableHead>Last opened by me</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tableData.map((section) =>
+              section.items.map((item) => (
+                <TableRow key={item.name}>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.ownedBy}</TableCell>
+                  <TableCell>{item.lastOpened}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </section>
     </>
   );

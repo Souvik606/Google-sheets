@@ -31,7 +31,11 @@ export function ProfileMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar>
-          <AvatarImage src="https://placehold.co/50x50" alt="@rahulc0dy" />
+          <AvatarImage
+            src="https://placehold.co/50x50"
+            alt="@rahulc0dy"
+            className="cursor-pointer transition-transform duration-300 hover:scale-125"
+          />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
