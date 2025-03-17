@@ -6,6 +6,7 @@ import {
   updateSpreadsheetAccess,
   updateSpreadsheetDescription,
   updateSpreadsheetName,
+  deleteSpreadsheet,
 } from "../controllers/spreadsheet.controller.js";
 import { verifyOwner } from "../middlewares/spreadsheet.middleware.js";
 
@@ -22,6 +23,8 @@ router
 router
   .route("/:spreadsheetId/edit-description")
   .patch(verifyJWT, verifyOwner, updateSpreadsheetDescription);
+router
+  .route("/:spreadsheetId/delete")
+  .delete(verifyJWT, verifyOwner, deleteSpreadsheet);
 
-router.route("/:spreadsheetId/sheet/create");
 export default router;

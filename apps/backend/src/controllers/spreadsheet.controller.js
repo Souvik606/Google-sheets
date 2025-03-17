@@ -14,6 +14,7 @@ import {
   getAllSpreadsheets,
   renameSpreadsheet,
   updateUserAccess,
+  deleteSpreadsheetById,
 } from "../database/queries/spreadsheet.queries.js";
 import dayjs from "dayjs";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -209,4 +210,40 @@ export const getSpreadsheets = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.OK)
     .json(new ApiResponse(spreadsheets, "Successfully fetched spreadsheets"));
+});
+
+export const deleteSpreadsheet = asyncHandler(async (req, res) => {
+  let deletedSpreadsheet;
+
+  const spreadsheetId = req.params.spreadsheetId;
+  const session = req.session;
+
+  if (session.user_id !== req.ownerId) {
+    throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Unauthorized access");
+  }
+
+  const existingSpreadsheet = await findSpreadsheetById(spreadsheetId);
+
+  if (existingSpreadsheet.length <= 0) {
+    throw new ApiError(
+      STATUS.CLIENT_ERROR.BAD_REQUEST,
+      "Invalid spreadsheet id"
+    );
+  }
+
+  try {
+    deletedSpreadsheet = await deleteSpreadsheetById(spreadsheetId);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while deleting spreadsheet",
+      err
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(
+      new ApiResponse(deletedSpreadsheet, "Successfully deleted spreadsheet")
+    );
 });

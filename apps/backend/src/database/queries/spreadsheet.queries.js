@@ -50,6 +50,17 @@ export const editSpreadsheetDescription = async (
   }
 };
 
+export const deleteSpreadsheetById = async (spreadsheetId) => {
+  try {
+    return await sql`
+    DELETE FROM spreadsheets WHERE spreadsheet_id = ${spreadsheetId}
+    RETURNING spreadsheet_id,spreadsheet_name
+    `;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 export const updateUserAccess = async (spreadsheetId, usersArray) => {
   console.log("usersArray", usersArray);
   try {
