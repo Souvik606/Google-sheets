@@ -1,6 +1,8 @@
+"use client";
+
 import Navbar from "@/components/Navbar";
 import React from "react";
-import { PlusIcon } from "lucide-react";
+import { CircleAlertIcon, CircleCheckIcon, PlusIcon } from "lucide-react";
 
 import {
   Table,
@@ -19,6 +21,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  createSheetService,
+  getAllSheetsService,
+} from "@/services/spreadsheetServices";
+import { toast } from "sonner";
 
 const tableData = [
   {
@@ -74,6 +82,36 @@ const tableData = [
 ];
 
 export default function Home() {
+  const {
+    mutate: createSheet,
+
+    isPending,
+  } = useMutation({
+    mutationFn: () => createSheetService(),
+    mutationKey: ["CreateSheet"],
+    onSuccess: (res) => {
+      toast(res.message, {
+        icon: <CircleCheckIcon className="text-emerald-500" />,
+        dismissible: true,
+      });
+    },
+    onError: (err) => {
+      toast(err.response ? err.response.data.message : err.message, {
+        icon: <CircleAlertIcon className="text-rose-500" />,
+        dismissible: true,
+      });
+    },
+  });
+
+  const { data: sheets, isLoading } = useQuery({
+    queryFn: () => getAllSheetsService(),
+    queryKey: ["CreateSheet"],
+  });
+
+  const onSubmit = (data) => {
+    createSheet({});
+  };
+
   return (
     <>
       <Navbar />
