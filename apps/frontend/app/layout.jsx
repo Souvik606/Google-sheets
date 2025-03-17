@@ -1,9 +1,9 @@
-import { Geist, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, Montserrat } from "next/font/google";
 import "../styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const geistSans = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
 });
 
@@ -13,8 +13,9 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "Looleg Sheets",
+  title: "Sheets",
   description: "Absolutely not google sheets. 😊",
+  icon: "/app-icons/favicon.ico",
 };
 
 export default function RootLayout({ children }) {
