@@ -8,12 +8,14 @@ import {
   updateSpreadsheetName,
   deleteSpreadsheet,
 } from "../controllers/spreadsheet.controller.js";
+import { getAllSheets } from "../controllers/sheet.controller.js";
 import { verifyOwner } from "../middlewares/spreadsheet.middleware.js";
 
 const router = Router();
 
 router.route("/").get(verifyJWT, getSpreadsheets);
 router.route("/create").post(verifyJWT, createSpreadsheet);
+router.route("/:spreadsheetId/").get(verifyJWT, verifyOwner, getAllSheets);
 router
   .route("/:spreadsheetId/update-access")
   .post(verifyJWT, verifyOwner, updateSpreadsheetAccess);
