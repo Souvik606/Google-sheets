@@ -125,7 +125,9 @@ export default function Home() {
 
       {/* New Spreadsheet */}
       <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
-        <h2 className={"text-lg font-semibold text-gray-600"}>
+        <h2
+          className={"text-lg font-semibold text-gray-600 dark:text-gray-400"}
+        >
           Start a new sheet
         </h2>
         <div className={"flex items-center gap-3 py-3"}>
@@ -133,13 +135,13 @@ export default function Home() {
             onClick={onSubmit}
             disabled={isPending}
             className={
-              "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300"
+              "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300 dark:border-gray-600 dark:from-teal-900 dark:to-gray-800 dark:hover:border-gray-500 dark:hover:from-black dark:hover:to-gray-700"
             }
           >
             <PlusIcon
               strokeWidth={2}
               size={100}
-              className={"text-teal-800/70"}
+              className={"text-teal-800/70 dark:text-teal-200/70"}
             />
           </Button>
         </div>
@@ -147,7 +149,11 @@ export default function Home() {
 
       <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
         <div className="flex items-center justify-between">
-          <h2 className={"text-lg font-semibold text-gray-600"}>My sheets</h2>
+          <h2
+            className={"text-lg font-semibold text-gray-600 dark:text-gray-400"}
+          >
+            My sheets
+          </h2>
           <div></div>
         </div>
         <Table>

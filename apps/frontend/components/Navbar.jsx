@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { SearchIcon, Moon, Sun } from "lucide-react";
@@ -28,7 +30,7 @@ const Navbar = () => {
 
   return (
     <AuthProvider>
-      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-3">
+      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-3 dark:bg-slate-700">
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <img
@@ -36,8 +38,8 @@ const Navbar = () => {
               alt="Logo"
               className="h-8 w-8"
             />
-            <span className="ml-2 font-mono text-xl font-bold text-teal-900">
-              Sheets
+            <span className="ml-2 font-mono text-xl font-bold text-teal-900 dark:text-teal-200">
+              Goggle Sheets
             </span>
           </Link>
         </div>
@@ -53,7 +55,20 @@ const Navbar = () => {
           </div>
         </div>
 
-        <ProfileMenu />
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={toggleTheme}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-700 transition-all duration-300 dark:bg-gray-200"
+          >
+            {theme === "light" ? (
+              <Moon className="h-6 w-6 text-white transition-all duration-300" />
+            ) : (
+              <Sun className="h-6 w-6 text-black transition-all duration-300" />
+            )}
+          </button>
+
+          <ProfileMenu />
+        </div>
       </nav>
     </AuthProvider>
   );
