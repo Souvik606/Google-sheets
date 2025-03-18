@@ -1,12 +1,32 @@
 import React from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, Moon, Sun } from "lucide-react";
 import { ProfileMenu } from "@/components/ProfileMenu";
 
 const Navbar = () => {
+  const [theme, setTheme] = useState("light");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
+      document.body.classList.toggle("dark", savedTheme === "dark");
+    } else {
+      setTheme("light");
+      document.body.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.body.classList.toggle("dark", newTheme === "dark");
+    localStorage.setItem("theme", newTheme);
+  };
+
   return (
-    <nav className="sticky top-0 flex items-center justify-between bg-white px-4 py-3">
+    <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-3">
       <div className="flex items-center space-x-2">
         <Link href="/" className="flex items-center">
           <img
