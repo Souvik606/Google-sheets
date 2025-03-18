@@ -108,11 +108,16 @@ export const updateUserAccess = async (spreadsheetId, usersArray) => {
 export const getAllSpreadsheets = async (userId) => {
   try {
     return await sql`
-    SELECT * from spreadsheets where owner_id = ${userId}
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE s.owner_id = ${userId}
     UNION
-    SELECT s.* from spreadsheets s,sheet_access sa
-    WHERE sa.user_id = ${userId}
-    AND sa.sheet_id=s.spreadsheet_id;
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE sa.user_id = ${userId};
     `;
   } catch (err) {
     console.log(err);

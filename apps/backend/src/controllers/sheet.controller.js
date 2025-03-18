@@ -112,7 +112,7 @@ export const renameSheet = asyncHandler(async (req, res) => {
 
   return res
     .status(STATUS.SUCCESS.OK)
-    .json(new ApiResponse(renamedSheets, "Sheets renamed successfully."));
+    .json(new ApiResponse(renamedSheets, "Sheet renamed successfully."));
 });
 
 export const getAllSheets = asyncHandler(async (req, res) => {
