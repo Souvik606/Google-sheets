@@ -2,8 +2,13 @@
 
 import React from "react";
 import ReactQueryProvider from "@/providers/ReactQueryClientProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
 
 const AuthLayout = ({ children }) => {
-  return <ReactQueryProvider>{children}</ReactQueryProvider>;
+  return (
+    <ReactQueryProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ReactQueryProvider>
+  );
 };
 export default AuthLayout;

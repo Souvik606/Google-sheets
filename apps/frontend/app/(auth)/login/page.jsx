@@ -16,10 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { loginSchema } from "@/schemas/authSchemas";
 import Link from "next/link";
-import { loginService } from "@/services/authentication";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CircleAlertIcon, CircleCheckIcon } from "lucide-react";
+import { useAuth } from "@/providers/AuthProvider";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
   const form = useForm({
@@ -30,8 +31,10 @@ export default function LoginPage() {
     },
   });
 
+  const { login } = useAuth();
+
   const { mutate, data, isSuccess, isError, isPending, error } = useMutation({
-    mutationFn: ({ email, password }) => loginService({ email, password }),
+    mutationFn: ({ email, password }) => login({ email, password }),
     mutationKey: ["userLogin"],
     onSuccess: (res) => {
       console.log(res);
@@ -39,7 +42,7 @@ export default function LoginPage() {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
       });
-      // redirect("/");
+      setTimeout(() => redirect("/"), 2000);
     },
     onError: (err) => {
       toast(err.response ? err.response.data.message : err.message, {
