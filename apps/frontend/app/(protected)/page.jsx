@@ -91,7 +91,6 @@ export default function Home() {
     mutationFn: () => createSheetService(),
     mutationKey: ["CreateSheet"],
     onSuccess: (res) => {
-      
       toast(res.message, {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
@@ -107,13 +106,17 @@ export default function Home() {
     },
   });
 
-  const { data: sheets, isLoading,isSuccess} = useQuery({
+  const {
+    data: sheets,
+    isLoading,
+    isSuccess,
+  } = useQuery({
     queryFn: () => getAllSheetsService(),
     queryKey: ["CreateSheet"],
   });
   isSuccess && console.log(sheets);
   const onSubmit = (data) => {
-    createSheet({});
+    createSheet();
   };
 
   return (
@@ -126,7 +129,9 @@ export default function Home() {
           Start a new sheet
         </h2>
         <div className={"flex items-center gap-3 py-3"}>
-          <Button onClick={onSubmit} disabled={isPending}
+          <Button
+            onClick={onSubmit}
+            disabled={isPending}
             className={
               "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300"
             }
@@ -172,14 +177,21 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isSuccess && sheets.data.map((item) =>
-             
+            {isLoading ? (
+              <TableRow>
+                <TableCell>Loading...</TableCell>
+                <TableCell>Loading...</TableCell>
+                <TableCell>Loading...</TableCell>
+              </TableRow>
+            ) : (
+              isSuccess &&
+              sheets.data.map((item) => (
                 <TableRow key={item.spreadsheet_id}>
                   <TableCell>{item.spreadsheet_name}</TableCell>
                   <TableCell>{item.owner_id}</TableCell>
                   <TableCell>{item.last_edited_at}</TableCell>
                 </TableRow>
-              
+              ))
             )}
           </TableBody>
         </Table>
