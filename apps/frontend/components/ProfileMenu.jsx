@@ -26,20 +26,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/AuthProvider";
+import { useState, useEffect } from "react";
 
 export function ProfileMenu() {
   const { logout } = useAuth();
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("auth");
+    if (storedData) {
+      console.log('storedData', storedData);
+      setUserData(JSON.parse(storedData));
+    }
+  }, []);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar>
-          <AvatarImage
-            src="https://placehold.co/50x50"
-            alt="@rahulc0dy"
-            className="cursor-pointer transition-transform duration-300 hover:scale-125"
-          />
+          {userData ? (
+            <AvatarImage
+              src={userData.user.profile_icon}
+              alt="@rahulc0dy"
+              className="cursor-pointer transition-transform duration-300 hover:scale-125"
+            />
+          ) : (
+            <AvatarImage
+              src="https://placehold.co/50x50"
+              alt="@rahulc0dy"
+              className="cursor-pointer transition-transform duration-300 hover:scale-125"
+            />
+          )}
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
+
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-7 w-60 font-medium">
         <DropdownMenuGroup>

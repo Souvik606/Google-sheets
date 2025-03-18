@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-
-      const { user } = response.data.data;
+      console.log("response=", response.data.data);
+      const user = response.data.data;
       setAuth({
         isAuthenticated: true,
         loading: false,
