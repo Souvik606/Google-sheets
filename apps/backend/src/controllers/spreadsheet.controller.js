@@ -16,6 +16,7 @@ import {
   updateUserAccess,
   deleteSpreadsheetById,
 } from "../database/queries/spreadsheet.queries.js";
+import { addSheets } from "../database/queries/sheet.queries.js";
 import dayjs from "dayjs";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -25,7 +26,9 @@ export const createSpreadsheet = asyncHandler(async (req, res) => {
 
   const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
-  let spreadSheet;
+  let spreadSheet,
+    sheet,
+    sheetName = "Sheet1";
 
   try {
     spreadSheet = await addSpreadsheet(
@@ -46,6 +49,24 @@ export const createSpreadsheet = asyncHandler(async (req, res) => {
     throw new ApiError(
       STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
       "Failed to create spreadsheet"
+    );
+  }
+
+  try {
+    sheet = await addSheets(spreadSheet.spreadsheet_id, sheetName);
+  } catch (err) {
+    await deleteSpreadsheetById(spreadSheet.spreadsheet_id);
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while creating sheet",
+      err
+    );
+  }
+
+  if (!sheet) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to create sheet"
     );
   }
 
@@ -238,6 +259,13 @@ export const deleteSpreadsheet = asyncHandler(async (req, res) => {
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
       "Something went wrong while deleting spreadsheet",
       err
+    );
+  }
+
+  if (!deletedSpreadsheet) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to delete spreadsheet"
     );
   }
 
