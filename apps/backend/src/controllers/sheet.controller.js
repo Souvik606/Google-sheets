@@ -7,6 +7,7 @@ import {
   fetchComments,
   findSheetById,
   renameSheets,
+  fetchSheets,
 } from "../database/queries/sheet.queries.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {
@@ -112,6 +113,44 @@ export const renameSheet = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.OK)
     .json(new ApiResponse(renamedSheets, "Sheets renamed successfully."));
+});
+
+export const getAllSheets = asyncHandler(async (req, res) => {
+  const users = req.users;
+  const spreadsheetId = req.params.spreadsheetId;
+  const userId = req.session.user_id;
+
+  const user = users.find((u) => u.user_id === userId);
+
+  if (!user) {
+    throw new ApiError(
+      STATUS.CLIENT_ERROR.FORBIDDEN,
+      "User don't have access to the spreadsheet"
+    );
+  }
+
+  let sheets;
+
+  try {
+    sheets = await fetchSheets(spreadsheetId);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while fetching sheets",
+      err
+    );
+  }
+
+  if (!sheets) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to fetch sheets"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(sheets, "Sheets fetched successfully"));
 });
 
 export const postComment = asyncHandler(async (req, res) => {
