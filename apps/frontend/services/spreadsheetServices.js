@@ -1,6 +1,6 @@
 import api from "@/lib/api";
 
-export const createSheetService = async ({ name, description }) => {
+export const createSheetService = async () => {
   const response = await api.post("/spreadsheet/create");
 
   return response.data;

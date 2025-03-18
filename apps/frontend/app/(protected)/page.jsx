@@ -27,6 +27,7 @@ import {
   getAllSheetsService,
 } from "@/services/spreadsheetServices";
 import { toast } from "sonner";
+import { redirect } from "next/dist/server/api-utils";
 
 const tableData = [
   {
@@ -90,12 +91,15 @@ export default function Home() {
     mutationFn: () => createSheetService(),
     mutationKey: ["CreateSheet"],
     onSuccess: (res) => {
+      
       toast(res.message, {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
       });
+      redirect("/sheets/");
     },
     onError: (err) => {
+      console.log(err);
       toast(err.response ? err.response.data.message : err.message, {
         icon: <CircleAlertIcon className="text-rose-500" />,
         dismissible: true,
@@ -103,11 +107,11 @@ export default function Home() {
     },
   });
 
-  const { data: sheets, isLoading } = useQuery({
+  const { data: sheets, isLoading,isSuccess} = useQuery({
     queryFn: () => getAllSheetsService(),
     queryKey: ["CreateSheet"],
   });
-
+  isSuccess && console.log(sheets);
   const onSubmit = (data) => {
     createSheet({});
   };
@@ -122,7 +126,7 @@ export default function Home() {
           Start a new sheet
         </h2>
         <div className={"flex items-center gap-3 py-3"}>
-          <Button
+          <Button onClick={onSubmit} disabled={isPending}
             className={
               "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300"
             }
@@ -168,14 +172,14 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tableData.map((section) =>
-              section.items.map((item) => (
-                <TableRow key={item.name}>
-                  <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.ownedBy}</TableCell>
-                  <TableCell>{item.lastOpened}</TableCell>
+            {isSuccess && sheets.data.map((item) =>
+             
+                <TableRow key={item.spreadsheet_id}>
+                  <TableCell>{item.spreadsheet_name}</TableCell>
+                  <TableCell>{item.owner_id}</TableCell>
+                  <TableCell>{item.last_edited_at}</TableCell>
                 </TableRow>
-              ))
+              
             )}
           </TableBody>
         </Table>
