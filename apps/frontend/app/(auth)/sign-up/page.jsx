@@ -17,9 +17,29 @@ import { Card } from "@/components/ui/card";
 import { registerSchema } from "@/schemas/authSchemas";
 import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
-import { signupService } from "@/services/authentication";
 import { toast } from "sonner";
 import { CircleAlertIcon, CircleCheckIcon } from "lucide-react";
+import api from "@/lib/api";
+
+const signupService = async ({ profileIcon, name, email, password }) => {
+  const formData = new FormData();
+
+  if (profileIcon) {
+    formData.append("profileIcon", profileIcon);
+  }
+
+  formData.append("name", name);
+  formData.append("email", email);
+  formData.append("password", password);
+
+  const response = await api.post("/auth/signup", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
 
 export default function SignUpPage() {
   const form = useForm({

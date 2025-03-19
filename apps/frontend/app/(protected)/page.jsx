@@ -3,7 +3,6 @@
 import Navbar from "@/components/Navbar";
 import React from "react";
 import { CircleAlertIcon, CircleCheckIcon, PlusIcon } from "lucide-react";
-
 import {
   Table,
   TableBody,
@@ -22,12 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  createSheetService,
-  getAllSheetsService,
-} from "@/services/spreadsheetServices";
 import { toast } from "sonner";
 import { redirect } from "next/dist/server/api-utils";
+import api from "@/lib/api";
 
 const dummyData = [
   {
@@ -80,7 +76,11 @@ export default function Home() {
 
     isPending,
   } = useMutation({
-    mutationFn: () => createSheetService(),
+    mutationFn: async () => {
+      const response = await api.post("/spreadsheet/create");
+
+      return response.data;
+    },
     mutationKey: ["CreateSheet"],
     onSuccess: (res) => {
       toast(res.message, {
@@ -103,13 +103,13 @@ export default function Home() {
     isLoading,
     isSuccess,
   } = useQuery({
-    queryFn: () => getAllSheetsService(),
+    queryFn: async () => {
+      const response = await api.get("/spreadsheet");
+
+      return response.data;
+    },
     queryKey: ["CreateSheet"],
   });
-  isSuccess && console.log(sheets);
-  const onSubmit = (data) => {
-    createSheet();
-  };
 
   return (
     <>
@@ -124,7 +124,7 @@ export default function Home() {
         </h2>
         <div className={"flex items-center gap-3 py-3"}>
           <Button
-            onClick={onSubmit}
+            onClick={(data) => createSheet(data)}
             disabled={isPending}
             className={
               "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300 dark:border-gray-600 dark:from-teal-900 dark:to-gray-800 dark:hover:border-gray-500 dark:hover:from-black dark:hover:to-gray-700"

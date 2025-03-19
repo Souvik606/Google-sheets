@@ -9,6 +9,7 @@ import {
   PlusCircle,
   Settings,
   User,
+  UserIcon,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -28,17 +29,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/AuthProvider";
 
 export function ProfileMenu() {
-  const { logout } = useAuth();
+  const { logout, auth } = useAuth();
+
+  const profileIcon = auth?.user?.profile_icon;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar>
+        <Avatar className="cursor-pointer rounded-full">
           <AvatarImage
-            src="https://placehold.co/50x50"
+            src={profileIcon}
             alt="@rahulc0dy"
             className="cursor-pointer transition-transform duration-300 hover:scale-125"
           />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarFallback>
+            <UserIcon />
+          </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-7 w-60 font-medium">

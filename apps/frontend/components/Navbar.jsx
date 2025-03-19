@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { SearchIcon, Moon, Sun } from "lucide-react";
+import { Moon, SearchIcon, Sun } from "lucide-react";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { AuthProvider } from "@/providers/AuthProvider";
 
@@ -58,7 +58,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-4">
           <button
             onClick={toggleTheme}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-700 transition-all duration-300 dark:bg-gray-200"
+            className="flex size-8 items-center justify-center rounded-full bg-gray-700 transition-all duration-300 dark:bg-gray-200"
           >
             {theme === "light" ? (
               <Moon className="h-6 w-6 text-white transition-all duration-300" />

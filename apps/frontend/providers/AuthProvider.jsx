@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
         withCredentials: true,
       });
 
-      const { user } = response.data.data;
+      const user = response.data.data;
       setAuth({
         isAuthenticated: true,
         loading: false,
