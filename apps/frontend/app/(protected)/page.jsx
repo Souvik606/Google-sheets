@@ -190,9 +190,7 @@ export default function Home() {
                 >
                   <TableCell>{item.spreadsheet_name}</TableCell>
                   <TableCell>{item.owner_id}</TableCell>
-                  <TableCell>
-                    {Date(item.last_edited_at).toLocaleString()}
-                  </TableCell>
+                  <TableCell>{item.last_edited_at}</TableCell>
                 </TableRow>
               ))
             )}

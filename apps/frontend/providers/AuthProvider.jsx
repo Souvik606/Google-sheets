@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { Loader } from "lucide-react";
-import { redirect } from "next/navigation";
 
 const UserAuthContext = createContext();
 
@@ -13,6 +12,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: false,
     loading: true,
     user: null,
+    userType: null,
   });
 
   const router = useRouter();
@@ -24,16 +24,22 @@ export const AuthProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-      console.log("response=", response.data.data);
+
       const user = response.data.data;
-      const tempAuth = {
+      setAuth({
         isAuthenticated: true,
         loading: false,
         user: user,
-      };
-      setAuth(tempAuth);
+      });
 
-      localStorage.setItem("auth", JSON.stringify(tempAuth));
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({
+          isAuthenticated: true,
+          user: user,
+        })
+      );
+
       return response.data;
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
@@ -43,29 +49,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async (shouldRedirect = false) => {
+  // Log out function
+  const logout = async (shouldRedirect = true) => {
     try {
-      const response = await api.delete(`/auth/logout`);
-
-      if (response.status === 200) {
-        console.log("Logged Out Successfully!");
-        shouldRedirect = true;
-      }
+      await api.post(`/auth/logout`, null, {
+        withCredentials: true,
+      });
     } catch (error) {
       console.error("Logout failed", error.response?.data || error.message);
     }
 
+    setAuth({ isAuthenticated: false, loading: false, user: null });
+    localStorage.removeItem("auth");
+
     if (shouldRedirect) {
-      const newAuthState = {
-        isAuthenticated: false,
-        loading: false,
-        user: null,
-      };
-
-      setAuth(newAuthState);
-      localStorage.removeItem("auth"); // Remove existing auth data
-      localStorage.setItem("auth", JSON.stringify(newAuthState)); // Store updated auth state
-
       router.push(`/login`);
     }
   };
@@ -73,24 +70,18 @@ export const AuthProvider = ({ children }) => {
   // Check login status on initial load
   useEffect(() => {
     const storedAuth = JSON.parse(localStorage.getItem("auth"));
-    if (!storedAuth?.isAuthenticated) {
-      setAuth({ isAuthenticated: false, loading: false, user: null });
-      router.push("/login");
-    } else {
+
+    if (storedAuth?.isAuthenticated) {
       setAuth({ ...storedAuth, loading: false });
-      setTimeout(() => redirect("/"), 500);
+    } else {
+      // If no auth data in localStorage, set loading to false and redirect to login
+      setAuth({ isAuthenticated: false, loading: false, user: null });
     }
   }, [router]);
 
   return (
     <UserAuthContext.Provider value={{ auth, login, logout }}>
-      {auth.loading ? (
-        <div className="flex h-screen items-center justify-center">
-          <Loader className="animate-spin" size={36} />
-        </div>
-      ) : (
-        children
-      )}
+      {auth.loading ? <Loader className={"animate-spin"} /> : children}
     </UserAuthContext.Provider>
   );
 };
