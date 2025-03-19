@@ -36,7 +36,7 @@ export function ProfileMenu() {
     const storedData = localStorage.getItem("auth");
     if (storedData) {
       console.log("storedData", storedData);
-      const tempData=JSON.parse(storedData)
+      const tempData = JSON.parse(storedData);
       setUserData(tempData.user);
     }
   }, []);

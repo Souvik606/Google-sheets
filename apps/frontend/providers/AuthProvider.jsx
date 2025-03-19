@@ -6,14 +6,13 @@ import api from "@/lib/api";
 import { Loader } from "lucide-react";
 import { redirect } from "next/navigation";
 
-
 const UserAuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     isAuthenticated: false,
     loading: true,
-    user: null
+    user: null,
   });
 
   const router = useRouter();
@@ -27,17 +26,14 @@ export const AuthProvider = ({ children }) => {
       });
       console.log("response=", response.data.data);
       const user = response.data.data;
-      const tempAuth={
+      const tempAuth = {
         isAuthenticated: true,
         loading: false,
-        user: user
+        user: user,
       };
       setAuth(tempAuth);
 
-      localStorage.setItem(
-        "auth",
-        JSON.stringify(tempAuth)
-      );
+      localStorage.setItem("auth", JSON.stringify(tempAuth));
       return response.data;
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
@@ -50,26 +46,29 @@ export const AuthProvider = ({ children }) => {
   const logout = async (shouldRedirect = false) => {
     try {
       const response = await api.delete(`/auth/logout`);
-      
+
       if (response.status === 200) {
-        console.log('Logged Out Successfully!');
+        console.log("Logged Out Successfully!");
         shouldRedirect = true;
       }
     } catch (error) {
       console.error("Logout failed", error.response?.data || error.message);
     }
-  
+
     if (shouldRedirect) {
-      const newAuthState = { isAuthenticated: false, loading: false, user: null };
-      
+      const newAuthState = {
+        isAuthenticated: false,
+        loading: false,
+        user: null,
+      };
+
       setAuth(newAuthState);
       localStorage.removeItem("auth"); // Remove existing auth data
       localStorage.setItem("auth", JSON.stringify(newAuthState)); // Store updated auth state
-      
+
       router.push(`/login`);
     }
   };
-  
 
   // Check login status on initial load
   useEffect(() => {
@@ -80,19 +79,19 @@ export const AuthProvider = ({ children }) => {
     } else {
       setAuth({ ...storedAuth, loading: false });
       setTimeout(() => redirect("/"), 500);
-    }    
+    }
   }, [router]);
 
   return (
     <UserAuthContext.Provider value={{ auth, login, logout }}>
-    {auth.loading ? (
-      <div className="flex items-center justify-center h-screen">
-        <Loader className="animate-spin"  size={36} />
-      </div>
-    ) : (
-      children
-    )}
-  </UserAuthContext.Provider>  
+      {auth.loading ? (
+        <div className="flex h-screen items-center justify-center">
+          <Loader className="animate-spin" size={36} />
+        </div>
+      ) : (
+        children
+      )}
+    </UserAuthContext.Provider>
   );
 };
 
