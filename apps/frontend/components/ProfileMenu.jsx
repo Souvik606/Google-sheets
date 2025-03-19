@@ -35,8 +35,9 @@ export function ProfileMenu() {
   useEffect(() => {
     const storedData = localStorage.getItem("auth");
     if (storedData) {
-      console.log('storedData', storedData);
-      setUserData(JSON.parse(storedData));
+      console.log("storedData", storedData);
+      const tempData=JSON.parse(storedData)
+      setUserData(tempData.user);
     }
   }, []);
 
@@ -46,7 +47,7 @@ export function ProfileMenu() {
         <Avatar>
           {userData ? (
             <AvatarImage
-              src={userData.user.profile_icon}
+              src={userData.profile_icon}
               alt="@rahulc0dy"
               className="cursor-pointer transition-transform duration-300 hover:scale-125"
             />
@@ -59,7 +60,6 @@ export function ProfileMenu() {
           )}
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
-
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-7 w-60 font-medium">
         <DropdownMenuGroup>
