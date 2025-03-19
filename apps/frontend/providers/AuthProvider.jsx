@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
   // Log out function
   const logout = async (shouldRedirect = true) => {
     try {
-      await api.post(`/auth/logout`, null, {
+      await api.delete(`/auth/logout`, {
         withCredentials: true,
       });
     } catch (error) {
@@ -81,7 +81,13 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <UserAuthContext.Provider value={{ auth, login, logout }}>
-      {auth.loading ? <Loader className={"animate-spin"} /> : children}
+      {auth.loading ? (
+        <div className={"flex min-h-screen items-center justify-center"}>
+          <Loader className={"animate-spin"} />
+        </div>
+      ) : (
+        children
+      )}
     </UserAuthContext.Provider>
   );
 };

@@ -37,7 +37,6 @@ export default function LoginPage() {
     mutationFn: ({ email, password }) => login({ email, password }),
     mutationKey: ["userLogin"],
     onSuccess: (res) => {
-      console.log(res);
       toast(res.message, {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
@@ -45,6 +44,7 @@ export default function LoginPage() {
       setTimeout(() => redirect("/"), 2000);
     },
     onError: (err) => {
+      console.error(err);
       toast(err.response ? err.response.data.message : err.message, {
         icon: <CircleAlertIcon className="text-rose-500" />,
         dismissible: true,
