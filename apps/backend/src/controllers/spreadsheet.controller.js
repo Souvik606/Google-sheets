@@ -15,6 +15,7 @@ import {
   renameSpreadsheet,
   updateUserAccess,
   deleteSpreadsheetById,
+  fetchSheets,
 } from "../database/queries/spreadsheet.queries.js";
 import { addSheets } from "../database/queries/sheet.queries.js";
 import dayjs from "dayjs";
@@ -124,7 +125,7 @@ export const updateSpreadsheetName = asyncHandler(async (req, res) => {
   if (existingSpreadsheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 
@@ -169,7 +170,7 @@ export const updateSpreadsheetDescription = asyncHandler(async (req, res) => {
   if (existingSpreadsheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 
@@ -248,7 +249,7 @@ export const deleteSpreadsheet = asyncHandler(async (req, res) => {
   if (existingSpreadsheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 
@@ -274,4 +275,30 @@ export const deleteSpreadsheet = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(deletedSpreadsheet, "Successfully deleted spreadsheet")
     );
+});
+
+export const getAllSheets = asyncHandler(async (req, res) => {
+  const spreadsheetId = req.params.spreadsheetId;
+  let sheets;
+
+  try {
+    sheets = await fetchSheets(spreadsheetId);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while fetching sheets",
+      err
+    );
+  }
+
+  if (!sheets) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to fetch sheets"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(sheets, "Sheets fetched successfully"));
 });

@@ -26,12 +26,6 @@ export const renameSheets = async (sheetId, newName) => {
   return renamedSheet[0];
 };
 
-export const fetchSheets = async (spreadsheetId) => {
-  return sql`
-    SELECT * FROM sheets
-    WHERE spreadsheet_id = ${spreadsheetId}`;
-};
-
 export const createComments = async (sheetId, userId, content, timestamp) => {
   const comment = await sql`
     INSERT INTO comments (commenter_id, sheet_id, comment,time_stamp) 

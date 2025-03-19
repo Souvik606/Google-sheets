@@ -7,7 +7,6 @@ import {
   fetchComments,
   findSheetById,
   renameSheets,
-  fetchSheets,
 } from "../database/queries/sheet.queries.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {
@@ -27,14 +26,14 @@ export const createSheet = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have access to the spreadsheet"
+      "User doesn't have access to the spreadsheet"
     );
   }
 
   if (user.role !== "editor") {
     throw new ApiError(
       STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have edit access"
+      "User doesn't have edit access"
     );
   }
 
@@ -73,21 +72,21 @@ export const renameSheet = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have access to the spreadsheet"
+      "User doesn't have access to the spreadsheet"
     );
   }
 
   if (user.role !== "editor") {
     throw new ApiError(
       STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have edit access"
+      "User doesn't have edit access"
     );
   }
 
   const sheet = await findSheetById(sheetId);
 
   if (!sheet) {
-    throw new ApiError(STATUS.CLIENT_ERROR.BAD_REQUEST, "Invalid Sheet id");
+    throw new ApiError(STATUS.CLIENT_ERROR.BAD_REQUEST, "Invalid sheet ID");
   }
 
   let renamedSheets;
@@ -115,44 +114,6 @@ export const renameSheet = asyncHandler(async (req, res) => {
     .json(new ApiResponse(renamedSheets, "Sheet renamed successfully."));
 });
 
-export const getAllSheets = asyncHandler(async (req, res) => {
-  const users = req.users;
-  const spreadsheetId = req.params.spreadsheetId;
-  const userId = req.session.user_id;
-
-  const user = users.find((u) => u.user_id === userId);
-
-  if (!user) {
-    throw new ApiError(
-      STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have access to the spreadsheet"
-    );
-  }
-
-  let sheets;
-
-  try {
-    sheets = await fetchSheets(spreadsheetId);
-  } catch (err) {
-    throw new ApiError(
-      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
-      "Something went wrong while fetching sheets",
-      err
-    );
-  }
-
-  if (!sheets) {
-    throw new ApiError(
-      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
-      "Failed to fetch sheets"
-    );
-  }
-
-  return res
-    .status(STATUS.SUCCESS.OK)
-    .json(new ApiResponse(sheets, "Sheets fetched successfully"));
-});
-
 export const postComment = asyncHandler(async (req, res) => {
   const users = req.users;
   const userId = req.session.user_id;
@@ -163,7 +124,7 @@ export const postComment = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have access to the spreadsheet"
+      "User doesn't have access to the spreadsheet"
     );
   }
 
@@ -171,7 +132,7 @@ export const postComment = asyncHandler(async (req, res) => {
   let comment;
 
   if (!sheet) {
-    throw new ApiError(STATUS.CLIENT_ERROR.FORBIDDEN, "Invalid Sheet id");
+    throw new ApiError(STATUS.CLIENT_ERROR.FORBIDDEN, "Invalid sheet ID");
   }
 
   const { content } = commentBodySchema.parse(req.body);
@@ -209,7 +170,7 @@ export const getAllComments = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.FORBIDDEN,
-      "User don't have access to the spreadsheet"
+      "User doesn't have access to the spreadsheet"
     );
   }
 

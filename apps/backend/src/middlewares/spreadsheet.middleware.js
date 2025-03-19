@@ -14,7 +14,7 @@ export const verifyOwner = asyncHandler(async (req, res, next) => {
   if (spreadSheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 
@@ -30,7 +30,7 @@ export const verifyAccess = asyncHandler(async (req, res, next) => {
   if (spreadSheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 

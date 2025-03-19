@@ -137,3 +137,9 @@ export const findAllUsers = async (spreadsheetId) => {
     throw err;
   }
 };
+
+export const fetchSheets = async (spreadsheetId) => {
+  return sql`
+    SELECT * FROM sheets
+    WHERE spreadsheet_id = ${spreadsheetId}`;
+};
