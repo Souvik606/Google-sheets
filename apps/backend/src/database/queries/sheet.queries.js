@@ -42,3 +42,12 @@ export const fetchComments = async (spreadsheetId) => {
     AND C.sheet_id=S.sheet_id
     AND C.commenter_id=U.user_id`;
 };
+
+export const deleteSheets = async (sheetId) => {
+  const deletedSheet = await sql`
+    DELETE FROM sheets 
+    WHERE sheet_id = ${sheetId} 
+    RETURNING sheet_id,sheet_name;
+  `;
+  return deletedSheet[0];
+};

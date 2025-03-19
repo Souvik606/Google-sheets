@@ -7,6 +7,7 @@ import {
   fetchComments,
   findSheetById,
   renameSheets,
+  deleteSheets,
 } from "../database/queries/sheet.queries.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {
@@ -196,4 +197,46 @@ export const getAllComments = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.OK)
     .json(new ApiResponse(comments, "Comments fetched successfully"));
+});
+
+export const deleteSheet = asyncHandler(async (req, res) => {
+  const users = req.users;
+  const sheetId = req.params.sheetId;
+  const userId = req.session.user_id;
+
+  const user = users.find((u) => u.user_id === userId);
+
+  if (!user) {
+    throw new ApiError(
+      STATUS.CLIENT_ERROR.FORBIDDEN,
+      "User doesn't have access to the spreadsheet"
+    );
+  }
+
+  if (user.role !== "editor") {
+    throw new ApiError(STATUS.CLIENT_ERROR.FORBIDDEN, "User is not Editor");
+  }
+
+  let sheet;
+
+  try {
+    sheet = await deleteSheets(sheetId);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while deleting sheet",
+      err
+    );
+  }
+
+  if (!sheet) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to delete sheet"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(sheet, "Sheet deleted successfully."));
 });

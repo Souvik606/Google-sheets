@@ -307,7 +307,7 @@ export const getAllSheets = asyncHandler(async (req, res) => {
 export const searchSpreadsheets = asyncHandler(async (req, res) => {
   const session = req.session;
   const searchQuery = req.query.query || "";
-  const resultsPerPage = 2;
+  const resultsPerPage = 20;
   const pageOffset = (parseInt(req.query.page, 10) - 1) * resultsPerPage || 0;
   let spreadsheets;
 
