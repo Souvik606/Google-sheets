@@ -117,7 +117,8 @@ export const getAllSpreadsheets = async (userId) => {
     FROM spreadsheets s
     JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
     JOIN "users" u ON s.owner_id = u.user_id
-    WHERE sa.user_id = ${userId};
+    WHERE sa.user_id = ${userId}
+    ORDER BY last_edited_at DESC;
     `;
   } catch (err) {
     console.log(err);
@@ -142,4 +143,35 @@ export const fetchSheets = async (spreadsheetId) => {
   return sql`
     SELECT * FROM sheets
     WHERE spreadsheet_id = ${spreadsheetId}`;
+};
+
+export const searchSpreadsheetsByNames = async (
+  userId,
+  searchQuery,
+  offset,
+  limit
+) => {
+  try {
+    return await sql`
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE s.owner_id = ${userId}
+    AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+         OR s.description ILIKE '%' || ${searchQuery} || '%')
+    UNION
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE sa.user_id = ${userId}
+    AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+         OR s.description ILIKE '%' || ${searchQuery} || '%')
+    ORDER BY last_edited_at DESC
+    LIMIT ${limit} OFFSET ${offset};
+    `;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };

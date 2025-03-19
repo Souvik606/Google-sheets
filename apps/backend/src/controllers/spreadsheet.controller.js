@@ -16,6 +16,7 @@ import {
   updateUserAccess,
   deleteSpreadsheetById,
   fetchSheets,
+  searchSpreadsheetsByNames,
 } from "../database/queries/spreadsheet.queries.js";
 import { addSheets } from "../database/queries/sheet.queries.js";
 import dayjs from "dayjs";
@@ -301,4 +302,38 @@ export const getAllSheets = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.OK)
     .json(new ApiResponse(sheets, "Sheets fetched successfully"));
+});
+
+export const searchSpreadsheets = asyncHandler(async (req, res) => {
+  const session = req.session;
+  const searchQuery = req.query.query || "";
+  const resultsPerPage = 2;
+  const pageOffset = (parseInt(req.query.page, 10) - 1) * resultsPerPage || 0;
+  let spreadsheets;
+
+  try {
+    spreadsheets = await searchSpreadsheetsByNames(
+      session.user_id,
+      searchQuery,
+      pageOffset,
+      resultsPerPage
+    );
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while searching spreadsheets",
+      err
+    );
+  }
+
+  if (!spreadsheets) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to search spreadsheets"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(spreadsheets, "Successfully searched spreadsheets"));
 });
