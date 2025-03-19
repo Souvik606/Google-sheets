@@ -27,24 +27,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/AuthProvider";
+import { useState, useEffect } from "react";
 
 export function ProfileMenu() {
-  const { logout, auth } = useAuth();
+  const { logout } = useAuth();
+  const [userData, setUserData] = useState(null);
 
-  const profileIcon = auth?.user?.profile_icon;
+  useEffect(() => {
+    const storedData = localStorage.getItem("auth");
+    if (storedData) {
+      console.log("storedData", storedData);
+      const tempData = JSON.parse(storedData);
+      setUserData(tempData.user);
+    }
+  }, []);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer rounded-full">
-          <AvatarImage
-            src={profileIcon}
-            alt="@rahulc0dy"
-            className="cursor-pointer transition-transform duration-300 hover:scale-125"
-          />
-          <AvatarFallback>
-            <UserIcon />
-          </AvatarFallback>
+        <Avatar>
+          {userData ? (
+            <AvatarImage
+              src={userData.profile_icon}
+              alt="@rahulc0dy"
+              className="cursor-pointer transition-transform duration-300 hover:scale-125"
+            />
+          ) : (
+            <AvatarImage
+              src="https://placehold.co/50x50"
+              alt="@rahulc0dy"
+              className="cursor-pointer transition-transform duration-300 hover:scale-125"
+            />
+          )}
+          <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-7 w-60 font-medium">
