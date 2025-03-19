@@ -29,56 +29,48 @@ import {
 import { toast } from "sonner";
 import { redirect } from "next/dist/server/api-utils";
 
-const tableData = [
+const dummyData = [
   {
-    groupName: "Yesterday",
-    items: [
-      {
-        name: "Monthly Expenses 2025",
-        ownedBy: "me",
-        lastOpened: "Mar 16, 2025",
-      },
-      {
-        name: "MPP Lab Teams",
-        ownedBy: "me",
-        lastOpened: "Mar 16, 2025",
-      },
-      {
-        name: "Mini Project_6th_sem_2024",
-        ownedBy: "Ninja Hattori",
-        lastOpened: "Mar 16, 2025",
-      },
-    ],
+    spreadsheet_id: 1,
+    spreadsheet_name: "2025 Election Results",
+    owner_id: "election commissioner",
+    last_edited_at: "Mar 16, 2025",
   },
   {
-    groupName: "Previous 30 days",
-    items: [
-      {
-        name: "Attendance",
-        ownedBy: "me",
-        lastOpened: "Feb 19, 2025",
-      },
-      {
-        name: "Code Conduct Registration Form (Responses)",
-        ownedBy: "me",
-        lastOpened: "Feb 19, 2025",
-      },
-    ],
+    spreadsheet_id: 2,
+    spreadsheet_name: "MPP Lab Teams",
+    owner_id: "anyone",
+    last_edited_at: "Mar 16, 2025",
   },
   {
-    groupName: "Earlier",
-    items: [
-      {
-        name: "Due of post Boarders (Mess)_2022",
-        ownedBy: "Arnab",
-        lastOpened: "Jan 16, 2025",
-      },
-      {
-        name: "REF 2025 Payment sheet.xlsx",
-        ownedBy: "me",
-        lastOpened: "Dec 29, 2024",
-      },
-    ],
+    spreadsheet_id: 3,
+    spreadsheet_name: "Mavuika Damage Calcs",
+    owner_id: "me",
+    last_edited_at: "Mar 16, 2025",
+  },
+  {
+    spreadsheet_id: 4,
+    spreadsheet_name: "Attendance",
+    owner_id: "me",
+    last_edited_at: "Feb 19, 2025",
+  },
+  {
+    spreadsheet_id: 5,
+    spreadsheet_name: "Code Combat Registration Form (Responses)",
+    owner_id: "me",
+    last_edited_at: "Feb 19, 2025",
+  },
+  {
+    spreadsheet_id: 6,
+    spreadsheet_name: "CSE 2022-26",
+    owner_id: "Arkopravo Saha",
+    last_edited_at: "Jan 16, 2025",
+  },
+  {
+    spreadsheet_id: 7,
+    spreadsheet_name: "balls",
+    owner_id: "me",
+    last_edited_at: "Jan 25, 2025",
   },
 ];
 
@@ -158,14 +150,14 @@ export default function Home() {
         </div>
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-gray-100 hover:bg-gray-300 dark:bg-gray-900 dark:hover:bg-slate-800">
               <TableHead className="w-1/2">Name</TableHead>
               <TableHead>
                 <Select>
                   <SelectTrigger
                     size={"default"}
                     className={
-                      "cursor-pointer border-none p-0 shadow-none focus:border-none focus:outline-none focus-visible:shadow-none focus-visible:ring-0"
+                      "cursor-pointer border-none bg-transparent p-0 shadow-none focus:border-none focus:outline-none focus-visible:shadow-none focus-visible:ring-0 dark:bg-transparent"
                     }
                   >
                     <SelectValue placeholder="Owned by" />
@@ -179,12 +171,12 @@ export default function Home() {
                   </SelectContent>
                 </Select>
               </TableHead>
-              <TableHead>Last opened by me</TableHead>
+              <TableHead>Last edited</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow>
+              <TableRow className="hover:bg-gray-200 dark:hover:bg-gray-900">
                 <TableCell>Loading...</TableCell>
                 <TableCell>Loading...</TableCell>
                 <TableCell>Loading...</TableCell>
@@ -192,7 +184,10 @@ export default function Home() {
             ) : (
               isSuccess &&
               sheets.data.map((item) => (
-                <TableRow key={item.spreadsheet_id}>
+                <TableRow
+                  className="hover:bg-gray-200 dark:hover:bg-gray-900"
+                  key={item.spreadsheet_id}
+                >
                   <TableCell>{item.spreadsheet_name}</TableCell>
                   <TableCell>{item.owner_id}</TableCell>
                   <TableCell>{item.last_edited_at}</TableCell>
