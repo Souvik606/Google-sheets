@@ -1,10 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { Loader } from "lucide-react";
-import { redirect } from "next/navigation";
 
 const UserAuthContext = createContext();
 
@@ -30,10 +29,12 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: true,
         loading: false,
         user: user,
-      };
-      setAuth(tempAuth);
+      });
 
-      localStorage.setItem("auth", JSON.stringify(tempAuth));
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ isAuthenticated: true, user })
+      );
       return response.data;
     } catch (error) {
       console.error("Login failed:", error.response?.data || error.message);
