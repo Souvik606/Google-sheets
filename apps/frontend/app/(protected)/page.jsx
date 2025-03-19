@@ -189,8 +189,10 @@ export default function Home() {
                   key={item.spreadsheet_id}
                 >
                   <TableCell>{item.spreadsheet_name}</TableCell>
-                  <TableCell>{item.owner_id}</TableCell>
-                  <TableCell>{item.last_edited_at}</TableCell>
+                  <TableCell>{item.owner_name}</TableCell>
+                  <TableCell>
+                    {new Date(item.last_edited_at).toLocaleString()}
+                  </TableCell>
                 </TableRow>
               ))
             )}
