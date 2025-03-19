@@ -1,111 +1,40 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import React from "react";
-import { CircleAlertIcon, CircleCheckIcon, PlusIcon } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import React, { useState } from "react";
+import { CircleAlertIcon, CircleCheckIcon, PlusIcon, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { redirect } from "next/dist/server/api-utils";
 import api from "@/lib/api";
-
-const dummyData = [
-  {
-    spreadsheet_id: 1,
-    spreadsheet_name: "2025 Election Results",
-    owner_id: "election commissioner",
-    last_edited_at: "Mar 16, 2025",
-  },
-  {
-    spreadsheet_id: 2,
-    spreadsheet_name: "MPP Lab Teams",
-    owner_id: "anyone",
-    last_edited_at: "Mar 16, 2025",
-  },
-  {
-    spreadsheet_id: 3,
-    spreadsheet_name: "Mavuika Damage Calcs",
-    owner_id: "me",
-    last_edited_at: "Mar 16, 2025",
-  },
-  {
-    spreadsheet_id: 4,
-    spreadsheet_name: "Attendance",
-    owner_id: "me",
-    last_edited_at: "Feb 19, 2025",
-  },
-  {
-    spreadsheet_id: 5,
-    spreadsheet_name: "Code Combat Registration Form (Responses)",
-    owner_id: "me",
-    last_edited_at: "Feb 19, 2025",
-  },
-  {
-    spreadsheet_id: 6,
-    spreadsheet_name: "CSE 2022-26",
-    owner_id: "Arkopravo Saha",
-    last_edited_at: "Jan 16, 2025",
-  },
-  {
-    spreadsheet_id: 7,
-    spreadsheet_name: "balls",
-    owner_id: "me",
-    last_edited_at: "Jan 25, 2025",
-  },
-];
+import Image from "next/image";
 
 export default function Home() {
-  const {
-    mutate: createSheet,
+  const [ownerFilter, setOwnerFilter] = useState("anyone");
 
-    isPending,
-  } = useMutation({
+  const { mutate: createSheet, isPending } = useMutation({
     mutationFn: async () => {
       const response = await api.post("/spreadsheet/create");
-
       return response.data;
     },
     mutationKey: ["CreateSheet"],
     onSuccess: (res) => {
       toast(res.message, {
-        icon: <CircleCheckIcon className="text-emerald-500" />,
-        dismissible: true,
+        icon: <CircleCheckIcon className="text-emerald-500" />, dismissible: true,
       });
       redirect("/sheets/");
     },
     onError: (err) => {
-      console.log(err);
       toast(err.response ? err.response.data.message : err.message, {
-        icon: <CircleAlertIcon className="text-rose-500" />,
-        dismissible: true,
+        icon: <CircleAlertIcon className="text-rose-500" />, dismissible: true,
       });
     },
   });
 
-  const {
-    data: sheets,
-    isLoading,
-    isSuccess,
-  } = useQuery({
+  const { data: sheets, isLoading, isSuccess } = useQuery({
     queryFn: async () => {
       const response = await api.get("/spreadsheet");
-
       return response.data;
     },
     queryKey: ["CreateSheet"],
@@ -116,88 +45,87 @@ export default function Home() {
       <Navbar />
 
       {/* New Spreadsheet */}
-      <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
-        <h2
-          className={"text-lg font-semibold text-gray-600 dark:text-gray-400"}
-        >
-          Start a new sheet
-        </h2>
-        <div className={"flex items-center gap-3 py-3"}>
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <h2 className="text-center text-2xl font-bold text-gray-800 dark:text-gray-200">Start a new spreadsheet</h2>
+        <div className="flex justify-center items-center gap-6 py-6">
           <Button
-            onClick={(data) => createSheet(data)}
+            onClick={createSheet}
             disabled={isPending}
-            className={
-              "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300 dark:border-gray-600 dark:from-teal-900 dark:to-gray-800 dark:hover:border-gray-500 dark:hover:from-black dark:hover:to-gray-700"
-            }
+            className="flex hover:bg-neutral-100 hover:border-2 hover:border-teal-300 w-52 h-44 cursor-pointer items-center justify-center rounded-2xl border bg-white shadow-md hover:shadow-lg dark:bg-gray-900 dark:border-gray-700"
           >
-            <PlusIcon
-              strokeWidth={2}
-              size={100}
-              className={"text-teal-800/70 dark:text-teal-200/70"}
+            <Image
+              src="/app-icons/plus.png"
+              alt="Create spreadsheet"
+              width={140}
+              height={140}
+              className="w-3/4 h-3/4 object-contain"
             />
           </Button>
         </div>
+
       </section>
 
-      <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
-        <div className="flex items-center justify-between">
-          <h2
-            className={"text-lg font-semibold text-gray-600 dark:text-gray-400"}
-          >
-            My sheets
-          </h2>
-          <div></div>
+      {/* Sheets List */}
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <div className="flex items-center justify-between pb-8 text-gray-700 dark:text-gray-300">
+          <h2 className="text-2xl font-bold">My Sheets</h2>
+          <div className="relative">
+            <select
+              value={ownerFilter}
+              onChange={(e) => setOwnerFilter(e.target.value)}
+              className="bg-white dark:bg-gray-800 text-lg font-semibold py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-700 focus:outline-none cursor-pointer"
+            >
+              <option value="anyone">Owned by anyone</option>
+              <option value="me">Owned by me</option>
+              <option value="not-me">Not owned by me</option>
+            </select>
+          </div>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-gray-100 hover:bg-gray-300 dark:bg-gray-900 dark:hover:bg-slate-800">
-              <TableHead className="w-1/2">Name</TableHead>
-              <TableHead>
-                <Select>
-                  <SelectTrigger
-                    size={"default"}
-                    className={
-                      "cursor-pointer border-none bg-transparent p-0 shadow-none focus:border-none focus:outline-none focus-visible:shadow-none focus-visible:ring-0 dark:bg-transparent"
-                    }
-                  >
-                    <SelectValue placeholder="Owned by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="anyone">Owned by anyone</SelectItem>
-                      <SelectItem value="me">Owned by me</SelectItem>
-                      <SelectItem value="not-me">Not owned by me</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </TableHead>
-              <TableHead>Last edited</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow className="hover:bg-gray-200 dark:hover:bg-gray-900">
-                <TableCell>Loading...</TableCell>
-                <TableCell>Loading...</TableCell>
-                <TableCell>Loading...</TableCell>
-              </TableRow>
-            ) : (
-              isSuccess &&
-              sheets.data.map((item) => (
-                <TableRow
-                  className="hover:bg-gray-200 dark:hover:bg-gray-900"
-                  key={item.spreadsheet_id}
-                >
-                  <TableCell>{item.spreadsheet_name}</TableCell>
-                  <TableCell>{item.owner_name}</TableCell>
-                  <TableCell>
-                    {new Date(item.last_edited_at).toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <div className="text-lg dark:bg-slate-800 text-gray-600 dark:text-gray-400 flex items-center p-4">
+          <span className="flex-1 font-semibold">Name</span>
+          <span className="w-1/4 font-semibold">Owner</span>
+          <span className="w-1/4 font-semibold">Last edited</span>
+        </div>
+        <div>
+          {isLoading ? (
+            <p className="text-lg text-gray-500 dark:text-gray-400">Loading...</p>
+          ) : (
+            isSuccess &&
+            sheets.data.map((item) => (
+              <div
+                key={item.spreadsheet_id}
+                className="border-b flex items-center justify-between px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900 cursor-pointer"
+              >
+                <div className="flex items-center flex-1 gap-4">
+                  <Image
+                    src="/app-icons/android-chrome-192x192.png"
+                    alt="Logo"
+                    width={40} height={40}
+                    className="h-8 w-8"
+                  />
+                  <span className="text-gray-900 dark:text-gray-100 text-lg font-semibold">{item.spreadsheet_name}</span>
+                </div>
+                <span className="w-1/4 text-gray-700 dark:text-gray-300 text-lg font-medium">{item.owner_name}</span>
+                <span className="pl-6 w-1/4 text-gray-700 dark:text-gray-300 text-lg font-medium">
+                  {(() => {
+                    const editedDate = new Date(item.last_edited_at);
+                    const today = new Date();
+
+                    const isToday =
+                      editedDate.getDate() === today.getDate() &&
+                      editedDate.getMonth() === today.getMonth() &&
+                      editedDate.getFullYear() === today.getFullYear();
+
+                    return isToday
+                      ? editedDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: true })
+                      : editedDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                  })()}
+                </span>
+                <MoreVertical className="text-gray-500 dark:text-gray-400 cursor-pointer" />
+              </div>
+            ))
+          )}
+        </div>
       </section>
     </>
   );

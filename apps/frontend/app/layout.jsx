@@ -1,14 +1,8 @@
-import { JetBrains_Mono, Montserrat } from "next/font/google";
+import { Nunito } from "next/font/google";
 import "../styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = Montserrat({
-  variable: "--font-montserrat",
-  subsets: ["latin"],
-});
-
-const jetBrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const font = Nunito({
   subsets: ["latin"],
 });
 
@@ -22,7 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${jetBrainsMono.variable} antialiased`}
+        className={`${font.className} antialiased`}
       >
         {children}
         <Toaster />
