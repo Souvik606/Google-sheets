@@ -128,9 +128,9 @@ export default function Home() {
           <h2 className="text-2xl font-bold">My Sheets</h2>
           <button
             onClick={() => refetch()}
-            className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-500"
+            className="flex cursor-pointer items-center justify-center rounded-full"
           >
-            <RefreshCw className="h-6 w-6 text-black transition-all duration-300 dark:text-white" />
+            <RefreshCw className="h-6 w-6 text-black transition-all duration-300 hover:text-gray-700 dark:text-white dark:hover:text-gray-400" />
           </button>
         </div>
         <div className="flex items-center px-4 py-2 text-lg text-gray-600 dark:bg-slate-800 dark:text-gray-400">
