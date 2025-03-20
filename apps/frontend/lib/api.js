@@ -22,4 +22,18 @@ const api = axios.create({
   withCredentials: true,
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const { config, response } = error;
+
+    if (response?.status === 401 && !config._retry) {
+      console.debug("Intercepted error response");
+      localStorage.removeItem("auth");
+      return Promise.reject(response);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
