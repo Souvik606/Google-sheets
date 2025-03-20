@@ -44,6 +44,44 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const signup = async ({ profileIcon, name, email, password }) => {
+    const formData = new FormData();
+
+    if (profileIcon) {
+      formData.append("profileIcon", profileIcon);
+    }
+
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+
+    try {
+      const response = await api.post("/auth/signup", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      const user = response.data.data;
+      setAuth({
+        isAuthenticated: true,
+        loading: false,
+        user: user,
+      });
+
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({ isAuthenticated: true, user })
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Signup failed:", error.response?.data || error.message);
+      throw new Error(
+        "Login failed: " + error.response?.data?.message || "Unexpected error"
+      );
+    }
+  };
+
   const logout = async (shouldRedirect = false) => {
     try {
       await api.delete(`/auth/logout`, {
@@ -81,7 +119,7 @@ export const AuthProvider = ({ children }) => {
   }, [router]);
 
   return (
-    <UserAuthContext.Provider value={{ auth, login, logout }}>
+    <UserAuthContext.Provider value={{ auth, login, logout, signup }}>
       {auth.loading ? (
         <div className={"flex min-h-screen items-center justify-center"}>
           <Loader className={"animate-spin"} />

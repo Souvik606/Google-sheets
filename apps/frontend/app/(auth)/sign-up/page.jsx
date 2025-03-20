@@ -19,27 +19,8 @@ import Link from "next/link";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { CircleAlertIcon, CircleCheckIcon } from "lucide-react";
-import api from "@/lib/api";
-
-const signupService = async ({ profileIcon, name, email, password }) => {
-  const formData = new FormData();
-
-  if (profileIcon) {
-    formData.append("profileIcon", profileIcon);
-  }
-
-  formData.append("name", name);
-  formData.append("email", email);
-  formData.append("password", password);
-
-  const response = await api.post("/auth/signup", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-
-  return response.data;
-};
+import { useAuth } from "@/providers/AuthProvider";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const form = useForm({
@@ -52,15 +33,22 @@ export default function SignUpPage() {
     },
   });
 
+  const router = useRouter();
+
+  const { signup } = useAuth();
+
   const { mutate, data, isSuccess, isError, isPending } = useMutation({
     mutationFn: ({ profileIcon, name, email, password }) =>
-      signupService({ profileIcon, name, email, password }),
+      signup({ profileIcon, name, email, password }),
     mutationKey: ["userSignup"],
     onSuccess: (res) => {
       console.log(res);
       toast(res.message, {
         icon: <CircleCheckIcon className="text-emerald-500" />,
       });
+      setTimeout(() => {
+        router.push("/");
+      }, 2000);
     },
     onError: (err) => {
       console.log(err);
@@ -92,7 +80,7 @@ export default function SignUpPage() {
                       // Pass the FileList to the form field
                       onChange={(e) => field.onChange(e.target.files)}
                       accept="image/*"
-                      className="file:rounded file:border file:border-gray-300 file:bg-gray-100 file:px-1"
+                      className="file:rounded file:border file:border-gray-300 file:bg-gray-100 file:px-1 dark:file:border-gray-800 dark:file:bg-zinc-800"
                     />
                   </FormControl>
                   <FormMessage />
@@ -160,7 +148,7 @@ export default function SignUpPage() {
           <p className="text-sm text-gray-500">Already have an account?</p>
           <Link
             href="/login"
-            className="text-sm font-semibold text-gray-500 hover:text-gray-900"
+            className="text-sm font-semibold text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
           >
             Log In
           </Link>
