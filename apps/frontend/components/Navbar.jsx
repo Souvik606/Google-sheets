@@ -3,13 +3,17 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
-import { Moon, SearchIcon, Sun } from "lucide-react";
+import { Moon, SearchIcon, Sun, X } from "lucide-react";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import { AuthProvider } from "@/providers/AuthProvider";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
 
 const Navbar = () => {
   const [theme, setTheme] = useState("light");
+  const [query, setQuery] = useState("");
+  const [filteredResults, setFilteredResults] = useState([]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -27,6 +31,39 @@ const Navbar = () => {
     setTheme(newTheme);
     document.body.classList.toggle("dark", newTheme === "dark");
     localStorage.setItem("theme", newTheme);
+  };
+
+  const {
+    data: sheets,
+    isLoading: isSheetsFetchLoading,
+    isSuccess: isSheetsFetched,
+    refetch,
+  } = useQuery({
+    queryFn: async () => {
+      const response = await api.get("/spreadsheet");
+      return response.data;
+    },
+    queryKey: ["GetAllSheets"],
+  });
+
+  useEffect(() => {
+    if (!query.trim() || !isSheetsFetched) {
+      setFilteredResults([]);
+      return;
+    }
+
+    const filtered = sheets.data.filter(
+      (sheet) =>
+        sheet.spreadsheet_name.toLowerCase().includes(query.toLowerCase()) ||
+        sheet.owner_name.toLowerCase().includes(query.toLowerCase())
+    );
+
+    setFilteredResults(filtered);
+  }, [query, sheets, isSheetsFetched]);
+
+  const clearSearch = () => {
+    setQuery("");
+    setFilteredResults([]);
   };
 
   return (
@@ -48,14 +85,39 @@ const Navbar = () => {
         </div>
 
         <div className="relative w-2/5 max-w-3xl">
-          <Input
-            type="text"
-            placeholder="Search..."
-            className="h-14 w-full rounded-full border border-gray-400 bg-teal-50 py-2 pr-4 pl-12 text-xl shadow-teal-300/40 drop-shadow-lg placeholder:text-xl focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
-          />
-          <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
-            <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
+          <div className="relative flex h-14 w-full items-center">
+            <Input
+              type="text"
+              placeholder="Search..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 text-xl shadow-teal-300/40 drop-shadow-lg placeholder:text-xl placeholder:leading-none focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
+            />
+            <div className="pointer-events-none absolute left-4 flex items-center">
+              <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
+            </div>
+            {query && (
+              <button onClick={clearSearch} className="absolute right-4">
+                <X className="h-6 w-6 text-gray-500 transition hover:text-red-500" />
+              </button>
+            )}
           </div>
+
+          {query && (
+            <div className="absolute z-10 mt-2 w-full rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
+              {isSheetsFetchLoading ? (
+                <p className="text-gray-500 dark:text-gray-400">Loading...</p>
+              ) : filteredResults.length > 0 ? (
+                filteredResults.map((item, index) => (
+                  <p key={index}>{item.spreadsheet_name}</p>
+                ))
+              ) : (
+                <p className="text-gray-500 dark:text-gray-400">
+                  No results found.
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
