@@ -47,6 +47,7 @@ export default function Home() {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
       });
+      refetch();
     },
     onError: (err) => {
       toast(err.response ? err.response.data.message : err.message, {
