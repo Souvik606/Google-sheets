@@ -15,9 +15,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${font.className} antialiased`}
-      >
+      <body className={`${font.className} antialiased`}>
         {children}
         <Toaster />
       </body>

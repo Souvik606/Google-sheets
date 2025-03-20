@@ -58,7 +58,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 bg-gradient-to-br from-purple-100 to-teal-200">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 bg-gradient-to-br from-purple-100 to-teal-200 dark:from-slate-950 dark:to-zinc-900">
       <Card className="w-full max-w-md p-8">
         <h2 className="mb-6 text-center text-2xl font-bold">Login</h2>
         <Form {...form}>

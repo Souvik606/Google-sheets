@@ -31,13 +31,14 @@ const Navbar = () => {
 
   return (
     <AuthProvider>
-      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-4 dark:bg-slate-700">
+      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-2 dark:bg-slate-700">
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <Image
               src="/app-icons/android-chrome-192x192.png"
               alt="Logo"
-              width={40} height={40}
+              width={40}
+              height={40}
               className="h-8 w-8"
             />
             <span className="ml-2 font-mono text-xl font-bold text-teal-900 dark:text-teal-200">
@@ -46,17 +47,16 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <div className="relative w-2/5 max-w-3xl:">
+        <div className="max-w-3xl: relative w-2/5">
           <Input
             type="text"
             placeholder="Search..."
-            className="text-xl placeholder:text-xl h-14 w-full rounded-full border-2 bg-teal-50 py-3 pl-12 pr-4 shadow-md shadow-teal-300/30 focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-gray-700/40"
+            className="h-14 w-full rounded-full border-2 bg-teal-50 py-3 pr-4 pl-12 text-xl shadow-md shadow-teal-300/30 placeholder:text-xl focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-gray-700/40"
           />
           <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
             <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
           </div>
         </div>
-
 
         <div className="flex items-center space-x-4">
           <button
