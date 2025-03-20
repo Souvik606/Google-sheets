@@ -9,7 +9,7 @@ import {
   MoreVertical,
   ShareIcon,
   Trash2Icon,
-  RotateCw,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -25,7 +25,6 @@ import {
 import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
-import { RefreshCw } from "lucide-react";
 
 export default function Home() {
   const [ownerFilter, setOwnerFilter] = useState("anyone");
