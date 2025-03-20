@@ -35,7 +35,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <Image
-              src="/app-icons/android-chrome-192x192.png"
+              src="/assets/images/sheets-icon.png"
               alt="Logo"
               width={40}
               height={40}
@@ -51,7 +51,7 @@ const Navbar = () => {
           <Input
             type="text"
             placeholder="Search..."
-            className="h-14 w-full rounded-full border-2 bg-teal-50 py-3 pr-4 pl-12 text-xl shadow-md shadow-teal-300/30 placeholder:text-xl focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-gray-700/40"
+            className="text-xlshadow-teal-300/30 h-14 w-full rounded-full border border-gray-400 bg-teal-50 py-2 pr-4 pl-12 placeholder:text-xl focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-gray-700/40"
           />
           <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center">
             <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />

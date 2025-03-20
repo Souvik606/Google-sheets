@@ -2,16 +2,35 @@
 
 import Navbar from "@/components/Navbar";
 import React, { useState } from "react";
-import { CircleAlertIcon, CircleCheckIcon, MoreVertical } from "lucide-react";
+import {
+  CircleAlertIcon,
+  CircleCheckIcon,
+  EditIcon,
+  MoreVertical,
+  ShareIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { redirect } from "next/dist/server/api-utils";
 import api from "@/lib/api";
 import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [ownerFilter, setOwnerFilter] = useState("anyone");
+  const [showRenameDialog, setShowRenameDialog] = useState(false);
+  const [initialName, setInitialName] = useState("");
+  const [selectedSpreadsheetId, setSelectedSpreadsheetId] = useState("");
+
+  const router = useRouter();
 
   const { mutate: createSheet, isPending } = useMutation({
     mutationFn: async () => {
@@ -24,7 +43,6 @@ export default function Home() {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
       });
-      redirect("/sheets/");
     },
     onError: (err) => {
       toast(err.response ? err.response.data.message : err.message, {
@@ -36,8 +54,8 @@ export default function Home() {
 
   const {
     data: sheets,
-    isLoading,
-    isSuccess,
+    isLoading: isSheetsFetchLoading,
+    isSuccess: isSheetsFetched,
   } = useQuery({
     queryFn: async () => {
       const response = await api.get("/spreadsheet");
@@ -45,6 +63,27 @@ export default function Home() {
     },
     queryKey: ["CreateSheet"],
   });
+
+  const { mutate: deleteSpreadSheet, isPending: isSpreadSheetDeletePending } =
+    useMutation({
+      mutationFn: async ({ spreadSheetId }) => {
+        const response = await api.delete(`/spreadsheet/${spreadSheetId}`);
+        return response.data;
+      },
+      mutationKey: ["DeleteSpreadSheet"],
+      onSuccess: (res) => {
+        toast(res.message, {
+          icon: <CircleCheckIcon className="text-emerald-500" />,
+          dismissible: true,
+        });
+      },
+      onError: (err) => {
+        toast(err.response ? err.response.data.message : err.message, {
+          icon: <CircleAlertIcon className="text-rose-500" />,
+          dismissible: true,
+        });
+      },
+    });
 
   return (
     <>
@@ -108,24 +147,27 @@ export default function Home() {
           <span className="w-1/4 font-semibold">Last edited</span>
         </div>
         <div>
-          {isLoading ? (
+          {isSheetsFetchLoading ? (
             <p className="text-lg text-gray-500 dark:text-gray-400">
               Loading...
             </p>
           ) : (
-            isSuccess &&
+            isSheetsFetched &&
             sheets.data.map((item) => (
               <div
                 key={item.spreadsheet_id}
                 className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900"
               >
-                <div className="flex flex-1 items-center gap-4">
+                <div
+                  className="flex flex-1 items-center gap-4"
+                  onClick={() => router.push(`/sheets/${item.spreadsheet_id}`)}
+                >
                   <Image
-                    src="/app-icons/android-chrome-192x192.png"
+                    src="/assets/images/sheets-icon.png"
                     alt="Logo"
                     width={40}
                     height={40}
-                    className="h-8 w-8"
+                    className="size-5"
                   />
                   <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                     {item.spreadsheet_name}
@@ -157,12 +199,54 @@ export default function Home() {
                         });
                   })()}
                 </span>
-                <MoreVertical className="cursor-pointer text-gray-500 dark:text-gray-400" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger>
+                    <MoreVertical
+                      className={
+                        "cursor-pointer text-gray-500 transition-none hover:text-zinc-800 focus-visible:outline-none dark:hover:text-zinc-200"
+                      }
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      className={"cursor-pointer"}
+                      onClick={() => {
+                        setInitialName(item.spreadsheet_name);
+                        setShowRenameDialog(true);
+                      }}
+                    >
+                      <EditIcon />
+                      <span>Rename</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className={"cursor-pointer"}
+                      onClick={() =>
+                        deleteSpreadSheet({
+                          spreadSheetId: item.spreadsheet_id,
+                        })
+                      }
+                    >
+                      <Trash2Icon />
+                      <span>Delete</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className={"cursor-pointer"}>
+                      <ShareIcon />
+                      <span>Share</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ))
           )}
         </div>
       </section>
+
+      <RenameSpreadsheetDialog
+        open={showRenameDialog}
+        onOpenChange={setShowRenameDialog}
+        initialName={initialName}
+        sheetId={selectedSpreadsheetId}
+      />
     </>
   );
 }
