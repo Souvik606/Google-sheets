@@ -9,6 +9,7 @@ import {
   MoreVertical,
   ShareIcon,
   Trash2Icon,
+  RotateCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -24,6 +25,7 @@ import {
 import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
+import { RefreshCw } from "lucide-react";
 
 export default function Home() {
   const [ownerFilter, setOwnerFilter] = useState("anyone");
@@ -124,6 +126,12 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="flex items-center justify-between pb-8 text-gray-700 dark:text-gray-300">
           <h2 className="text-2xl font-bold">My Sheets</h2>
+          <button
+            onClick={() => refetch()}
+            className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-500"
+          >
+            <RefreshCw className="h-6 w-6 text-black transition-all duration-300 dark:text-white" />
+          </button>
         </div>
         <div className="flex items-center px-4 py-2 text-lg text-gray-600 dark:bg-slate-800 dark:text-gray-400">
           <span className="flex-1 font-semibold">Name</span>
