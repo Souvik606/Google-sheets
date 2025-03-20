@@ -22,6 +22,7 @@ export function RenameSpreadsheetDialog({
   onOpenChange,
   initialName,
   sheetId,
+  onRenameSuccess,
 }) {
   const [name, setName] = useState(initialName);
 
@@ -37,9 +38,12 @@ export function RenameSpreadsheetDialog({
   const { mutate: renameSpreadSheet, isPending: isSpreadSheetRenamePending } =
     useMutation({
       mutationFn: async ({ spreadSheetId, name }) => {
-        const response = await api.patch(`/spreadsheet/${spreadSheetId}`, {
-          name,
-        });
+        const response = await api.patch(
+          `/spreadsheet/${spreadSheetId}/rename`,
+          {
+            name,
+          }
+        );
         return response.data;
       },
       mutationKey: ["RenameSpreadSheet", initialName, sheetId],
@@ -48,6 +52,7 @@ export function RenameSpreadsheetDialog({
           icon: <CircleCheckIcon className="text-emerald-500" />,
           dismissible: true,
         });
+        onRenameSuccess();
       },
       onError: (err) => {
         toast(err.response ? err.response.data.message : err.message, {

@@ -60,18 +60,21 @@ export default function Home() {
     data: sheets,
     isLoading: isSheetsFetchLoading,
     isSuccess: isSheetsFetched,
+    refetch,
   } = useQuery({
     queryFn: async () => {
       const response = await api.get("/spreadsheet");
       return response.data;
     },
-    queryKey: ["CreateSheet"],
+    queryKey: ["GetAllSheets"],
   });
 
   const { mutate: deleteSpreadSheet, isPending: isSpreadSheetDeletePending } =
     useMutation({
       mutationFn: async ({ spreadSheetId }) => {
-        const response = await api.delete(`/spreadsheet/${spreadSheetId}`);
+        const response = await api.delete(
+          `/spreadsheet/${spreadSheetId}/delete`
+        );
         return response.data;
       },
       mutationKey: ["DeleteSpreadSheet"],
@@ -80,6 +83,7 @@ export default function Home() {
           icon: <CircleCheckIcon className="text-emerald-500" />,
           dismissible: true,
         });
+        refetch();
       },
       onError: (err) => {
         toast(err.response ? err.response.data.message : err.message, {
@@ -188,8 +192,8 @@ export default function Home() {
                       {item.spreadsheet_name}
                     </span>
                   </div>
-                  <span className="w-1/4 text-lg font-medium text-gray-700 dark:text-gray-300">
-                    {item.owner_name}
+                  <span className="w-1/4 text-center text-lg font-medium text-gray-700 dark:text-gray-300">
+                    {item.owner_id === userId ? "me" : item.owner_name}
                   </span>
                   <span className="w-1/4 pl-6 text-lg font-medium text-gray-700 dark:text-gray-300">
                     {(() => {
@@ -262,6 +266,7 @@ export default function Home() {
         onOpenChange={setShowRenameDialog}
         initialName={initialName}
         sheetId={selectedSpreadsheetId}
+        onRenameSuccess={refetch}
       />
     </>
   );
