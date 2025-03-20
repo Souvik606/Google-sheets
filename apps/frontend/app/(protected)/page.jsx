@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Home() {
   const [ownerFilter, setOwnerFilter] = useState("anyone");
@@ -31,6 +32,9 @@ export default function Home() {
   const [selectedSpreadsheetId, setSelectedSpreadsheetId] = useState("");
 
   const router = useRouter();
+  const { auth } = useAuth();
+
+  const userId = auth.user.user_id;
 
   const { mutate: createSheet, isPending } = useMutation({
     mutationFn: async () => {
@@ -153,90 +157,102 @@ export default function Home() {
             </p>
           ) : (
             isSheetsFetched &&
-            sheets.data.map((item) => (
-              <div
-                key={item.spreadsheet_id}
-                className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900"
-              >
+            sheets.data
+              .filter((sheet) => {
+                if (ownerFilter === "me") {
+                  return sheet.owner_id === userId;
+                } else if (ownerFilter === "not-me") {
+                  return sheet.owner_id !== userId;
+                }
+                return true;
+              })
+              .map((item) => (
                 <div
-                  className="flex flex-1 items-center gap-4"
-                  onClick={() => router.push(`/sheets/${item.spreadsheet_id}`)}
+                  key={item.spreadsheet_id}
+                  className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900"
                 >
-                  <Image
-                    src="/assets/images/sheets-icon.png"
-                    alt="Logo"
-                    width={40}
-                    height={40}
-                    className="size-5"
-                  />
-                  <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    {item.spreadsheet_name}
-                  </span>
-                </div>
-                <span className="w-1/4 text-lg font-medium text-gray-700 dark:text-gray-300">
-                  {item.owner_name}
-                </span>
-                <span className="w-1/4 pl-6 text-lg font-medium text-gray-700 dark:text-gray-300">
-                  {(() => {
-                    const editedDate = new Date(item.last_edited_at);
-                    const today = new Date();
-
-                    const isToday =
-                      editedDate.getDate() === today.getDate() &&
-                      editedDate.getMonth() === today.getMonth() &&
-                      editedDate.getFullYear() === today.getFullYear();
-
-                    return isToday
-                      ? editedDate.toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          hour12: true,
-                        })
-                      : editedDate.toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        });
-                  })()}
-                </span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <MoreVertical
-                      className={
-                        "cursor-pointer text-gray-500 transition-none hover:text-zinc-800 focus-visible:outline-none dark:hover:text-zinc-200"
-                      }
+                  <div
+                    className="flex flex-1 items-center gap-4"
+                    onClick={() =>
+                      router.push(`/sheets/${item.spreadsheet_id}`)
+                    }
+                  >
+                    <Image
+                      src="/assets/images/sheets-icon.png"
+                      alt="Logo"
+                      width={40}
+                      height={40}
+                      className="size-5"
                     />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      className={"cursor-pointer"}
-                      onClick={() => {
-                        setInitialName(item.spreadsheet_name);
-                        setShowRenameDialog(true);
-                      }}
-                    >
-                      <EditIcon />
-                      <span>Rename</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className={"cursor-pointer"}
-                      onClick={() =>
-                        deleteSpreadSheet({
-                          spreadSheetId: item.spreadsheet_id,
-                        })
-                      }
-                    >
-                      <Trash2Icon />
-                      <span>Delete</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className={"cursor-pointer"}>
-                      <ShareIcon />
-                      <span>Share</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ))
+                    <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      {item.spreadsheet_name}
+                    </span>
+                  </div>
+                  <span className="w-1/4 text-lg font-medium text-gray-700 dark:text-gray-300">
+                    {item.owner_name}
+                  </span>
+                  <span className="w-1/4 pl-6 text-lg font-medium text-gray-700 dark:text-gray-300">
+                    {(() => {
+                      const editedDate = new Date(item.last_edited_at);
+                      const today = new Date();
+
+                      const isToday =
+                        editedDate.getDate() === today.getDate() &&
+                        editedDate.getMonth() === today.getMonth() &&
+                        editedDate.getFullYear() === today.getFullYear();
+
+                      return isToday
+                        ? editedDate.toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                        : editedDate.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          });
+                    })()}
+                  </span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <MoreVertical
+                        className={
+                          "cursor-pointer text-gray-500 transition-none hover:text-zinc-800 focus-visible:outline-none dark:hover:text-zinc-200"
+                        }
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        className={"cursor-pointer"}
+                        onClick={() => {
+                          setInitialName(item.spreadsheet_name);
+                          setSelectedSpreadsheetId(item.spreadsheet_id);
+                          setShowRenameDialog(true);
+                        }}
+                      >
+                        <EditIcon />
+                        <span>Rename</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className={"cursor-pointer"}
+                        onClick={() =>
+                          deleteSpreadSheet({
+                            spreadSheetId: item.spreadsheet_id,
+                          })
+                        }
+                      >
+                        <Trash2Icon />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className={"cursor-pointer"}>
+                        <ShareIcon />
+                        <span>Share</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              ))
           )}
         </div>
       </section>
