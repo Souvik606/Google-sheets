@@ -187,7 +187,7 @@ export default function Home() {
                   className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900/50"
                 >
                   <div
-                    className="flex flex-1 items-center gap-4"
+                    className="flex flex-1 items-center gap-6"
                     onClick={() =>
                       router.push(`/sheets/${item.spreadsheet_id}`)
                     }
