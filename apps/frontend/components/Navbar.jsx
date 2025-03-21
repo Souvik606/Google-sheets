@@ -70,7 +70,7 @@ const Navbar = () => {
 
   return (
     <AuthProvider>
-      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-2 dark:bg-slate-800">
+      <nav className="sticky top-0 z-50 flex items-center justify-between bg-slate-100 px-4 py-2 dark:bg-slate-800">
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <Image
