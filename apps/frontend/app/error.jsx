@@ -14,6 +14,7 @@ const ErrorPage = ({ error }) => {
         <h2 className="text-lg text-zinc-700">
           We are already on it. Please come back later.
         </h2>
+        <h3 className={"font-mono text-rose-500"}>{error.message}</h3>
       </div>
     </>
   );

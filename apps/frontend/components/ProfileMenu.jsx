@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/providers/AuthProvider";
-import { useState, useEffect } from "react";
 
 export function ProfileMenu() {
   const { logout, auth } = useAuth();
@@ -37,7 +36,7 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="cursor-pointer rounded-full">
+        <Avatar className="size-10 cursor-pointer rounded-full">
           <AvatarImage
             src={profileIcon}
             alt="@rahulc0dy"

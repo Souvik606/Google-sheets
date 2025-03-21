@@ -68,30 +68,30 @@ const Navbar = () => {
 
   return (
     <AuthProvider>
-      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-2 dark:bg-slate-700">
+      <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-4 py-2 dark:bg-slate-800">
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <Image
-              src="/assets/images/sheets-icon.png"
+              src="/app-icons/android-chrome-192x192.png"
               alt="Logo"
               width={40}
               height={40}
               className="h-8 w-8"
             />
-            <span className="ml-2 font-mono text-xl font-bold text-teal-900 dark:text-teal-200">
+            <span className="ml-2 font-mono text-xl font-bold tracking-widest text-teal-900 dark:text-teal-200">
               Goggle Sheets
             </span>
           </Link>
         </div>
 
         <div className="relative w-2/5 max-w-3xl">
-          <div className="relative flex h-14 w-full items-center">
+          <div className="relative flex w-full items-center">
             <Input
               type="text"
               placeholder="Search..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 text-xl shadow-teal-300/40 drop-shadow-lg placeholder:text-xl placeholder:leading-none focus:border-teal-700 focus:ring-2 focus:ring-teal-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
+              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-3 text-xl shadow-teal-300/40 transition-all placeholder:translate-y-0.5 placeholder:align-baseline placeholder:text-lg placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
             />
             <div className="pointer-events-none absolute left-4 flex items-center">
               <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
