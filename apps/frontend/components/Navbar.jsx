@@ -9,12 +9,15 @@ import { AuthProvider } from "@/providers/AuthProvider";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
   const [theme, setTheme] = useState("light");
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+
+  const router = useRouter();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -38,7 +41,6 @@ const Navbar = () => {
     data: sheets,
     isLoading: isSheetsFetchLoading,
     isSuccess: isSheetsFetched,
-    refetch,
   } = useQuery({
     queryFn: async () => {
       const response = await api.get("/spreadsheet");
@@ -76,15 +78,15 @@ const Navbar = () => {
               alt="Logo"
               width={40}
               height={40}
-              className="h-8 w-8"
+              className="size-7"
             />
-            <span className="ml-2 font-mono text-xl font-bold tracking-widest text-teal-900 dark:text-teal-200">
+            <span className="ml-4 font-mono text-lg font-bold tracking-widest text-teal-900 dark:text-teal-200">
               Goggle Sheets
             </span>
           </Link>
         </div>
 
-        <div className="relative w-2/5 max-w-3xl">
+        <div className="relative w-2/6 max-w-3xl">
           <div className="relative flex w-full items-center">
             <Input
               type="text"
@@ -93,9 +95,9 @@ const Navbar = () => {
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 400)}
-              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-3 text-xl shadow-teal-300/40 transition-all placeholder:translate-y-0.5 placeholder:align-baseline placeholder:text-lg placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
+              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-2 text-lg shadow-teal-300/40 transition-all placeholder:translate-y-0.5 placeholder:align-baseline placeholder:text-sm placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
             />
-            <div className="pointer-events-none absolute left-4 flex items-center">
+            <div className="pointer-events-none absolute left-3 flex items-center">
               <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
             </div>
             {query && (

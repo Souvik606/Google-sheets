@@ -1,3 +1,5 @@
+[![Linting Check](https://github.com/Souvik606/Google-sheets/actions/workflows/lint.yml/badge.svg)](https://github.com/Souvik606/Google-sheets/actions/workflows/lint.yml)
+
 # Google Sheets Clone Project
 
 This project is a monorepo structured application that replicates the functionalities of Google Sheets. It consists of

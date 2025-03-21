@@ -126,7 +126,7 @@ export default function Home() {
         <div className="flex items-center justify-between pb-8 text-gray-700 dark:text-gray-300">
           <h2 className="text-xl font-bold">My Sheets</h2>
         </div>
-        <div className="flex items-center bg-teal-50 px-4 py-2 text-lg text-gray-600 dark:bg-slate-800/50 dark:text-gray-400">
+        <div className="flex items-center bg-teal-50 px-4 py-1 text-lg text-gray-600 dark:bg-slate-800/50 dark:text-gray-400">
           <span className="flex-1 font-semibold">Name</span>
           <span className="w-1/4 font-semibold">
             <select
@@ -159,7 +159,9 @@ export default function Home() {
             onClick={() => refetch()}
             className="cursor-pointer rounded-full px-0.5"
           >
-            <RefreshCw className="size-5 !transition-none hover:text-green-700" />
+            <RefreshCw
+              className={`size-5 !transition-none hover:text-green-700 ${isSheetsFetchLoading && "animate-spin"}`}
+            />
           </button>
         </div>
         <div>
@@ -196,7 +198,7 @@ export default function Home() {
                       height={40}
                       className="size-5"
                     />
-                    <span className="font-semibold text-gray-900 dark:text-gray-100">
+                    <span className="line-clamp-1 max-w-prose font-semibold overflow-ellipsis text-gray-900 dark:text-gray-100">
                       {item.spreadsheet_name}
                     </span>
                   </div>
