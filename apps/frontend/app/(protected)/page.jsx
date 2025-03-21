@@ -7,8 +7,9 @@ import {
   CircleCheckIcon,
   EditIcon,
   MoreVertical,
+  Plus,
   RefreshCw,
-  ShareIcon,
+  SquareArrowOutUpRight,
   Trash2Icon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -239,7 +240,7 @@ export default function Home() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem
-                        className={"cursor-pointer"}
+                        className="cursor-pointer"
                         onClick={() => {
                           setInitialName(item.spreadsheet_name);
                           setSelectedSpreadsheetId(item.spreadsheet_id);
@@ -250,7 +251,7 @@ export default function Home() {
                         <span>Rename</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className={"cursor-pointer"}
+                        className="cursor-pointer"
                         onClick={() =>
                           deleteSpreadSheet({
                             spreadSheetId: item.spreadsheet_id,
@@ -260,9 +261,18 @@ export default function Home() {
                         <Trash2Icon />
                         <span>Delete</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className={"cursor-pointer"}>
-                        <ShareIcon />
-                        <span>Share</span>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() =>
+                          window.open(
+                            `/sheets/${item.spreadsheet_id}`,
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
+                      >
+                        <SquareArrowOutUpRight />
+                        <span>Open in new tab</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
