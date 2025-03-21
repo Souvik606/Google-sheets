@@ -58,7 +58,6 @@ const Navbar = () => {
         sheet.spreadsheet_name.toLowerCase().includes(query.toLowerCase()) ||
         sheet.owner_name.toLowerCase().includes(query.toLowerCase())
     );
-
     setFilteredResults(filtered);
   }, [query, sheets, isSheetsFetched]);
 
@@ -107,12 +106,61 @@ const Navbar = () => {
           </div>
 
           {query && isSearchFocused && (
-            <div className="absolute z-10 mt-2 w-full rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
+            <div className="absolute z-10 mt-2 max-h-72 w-full overflow-y-auto rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
               {isSheetsFetchLoading ? (
                 <p className="text-gray-500 dark:text-gray-400">Loading...</p>
               ) : filteredResults.length > 0 ? (
-                filteredResults.map((item, index) => (
-                  <p key={index}>{item.spreadsheet_name}</p>
+                filteredResults.map((item) => (
+                  <div
+                    key={item.spreadsheet_id}
+                    className="flex cursor-pointer items-center justify-between border-b px-4 py-3 hover:bg-gray-100 dark:hover:bg-slate-900/50"
+                  >
+                    <div
+                      className="flex flex-1 items-center gap-4"
+                      onClick={() =>
+                        router.push(`/sheets/${item.spreadsheet_id}`)
+                      }
+                    >
+                      <Image
+                        src="/assets/images/sheets-icon.png"
+                        alt="Logo"
+                        width={40}
+                        height={40}
+                        className="size-5"
+                      />
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-gray-900 dark:text-gray-100">
+                          {item.spreadsheet_name}
+                        </span>
+                        <span className="text-sm font-light text-gray-700 dark:text-gray-200">
+                          {item.owner_name}
+                        </span>
+                      </div>
+                      <span className="ml-auto text-sm font-light text-gray-700 dark:text-gray-300">
+                        {(() => {
+                          const editedDate = new Date(item.last_edited_at);
+                          const today = new Date();
+
+                          const isToday =
+                            editedDate.getDate() === today.getDate() &&
+                            editedDate.getMonth() === today.getMonth() &&
+                            editedDate.getFullYear() === today.getFullYear();
+
+                          return isToday
+                            ? editedDate.toLocaleTimeString("en-US", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              })
+                            : editedDate.toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              });
+                        })()}
+                      </span>
+                    </div>
+                  </div>
                 ))
               ) : (
                 <p className="text-gray-500 dark:text-gray-400">
