@@ -110,15 +110,9 @@ export default function Home() {
           <Button
             onClick={createSheet}
             disabled={isPending}
-            className="flex h-35 w-45 cursor-pointer items-center justify-center rounded-sm border-2 bg-white shadow-md saturate-0 transition-all hover:border-teal-300 hover:bg-teal-50 hover:shadow-lg hover:saturate-100 dark:border-gray-700 dark:bg-zinc-800 dark:hover:border-teal-50/70 dark:hover:bg-zinc-900"
+            className="flex h-35 w-45 cursor-pointer items-center justify-center rounded-sm border-2 bg-white text-teal-700 shadow-md !transition-none hover:border-teal-300 hover:bg-teal-50 hover:text-teal-900 hover:shadow-lg dark:border-gray-700 dark:bg-zinc-800 dark:text-cyan-500 dark:hover:border-teal-50/70 dark:hover:bg-zinc-900 dark:hover:text-cyan-300"
           >
-            <Image
-              src="/app-icons/plus.png"
-              alt="Create spreadsheet"
-              width={140}
-              height={140}
-              className="h-3/4 w-3/4 object-contain"
-            />
+            <Plus className="size-10 h-3/4 w-3/4 object-contain !transition-none hover:text-cyan-300" />
           </Button>
         </div>
       </section>
