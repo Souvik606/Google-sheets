@@ -106,14 +106,14 @@ const Navbar = () => {
           </div>
 
           {query && isSearchFocused && (
-            <div className="absolute z-10 mt-2 max-h-72 w-full overflow-y-auto rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
+            <div className="absolute z-10 mt-2 max-h-72 w-full overflow-y-auto rounded-lg bg-teal-50 p-4 shadow-lg dark:bg-gray-800">
               {isSheetsFetchLoading ? (
                 <p className="text-gray-500 dark:text-gray-400">Loading...</p>
               ) : filteredResults.length > 0 ? (
                 filteredResults.map((item) => (
                   <div
                     key={item.spreadsheet_id}
-                    className="flex cursor-pointer items-center justify-between border-b px-4 py-3 hover:bg-gray-100 dark:hover:bg-slate-900/50"
+                    className="flex cursor-pointer items-center justify-between border-b px-4 py-3 hover:bg-teal-100 dark:hover:bg-slate-900/50"
                   >
                     <div
                       className="flex flex-1 items-center gap-4"
