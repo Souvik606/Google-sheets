@@ -1,9 +1,15 @@
-import { Nunito } from "next/font/google";
+import { JetBrains_Mono, Nunito } from "next/font/google";
 import "../styles/globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const font = Nunito({
+const nunito = Nunito({
   subsets: ["latin"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--jetbrains-mono",
 });
 
 export const metadata = {
@@ -14,8 +20,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${font.className} antialiased`}>
+    <html lang="en" className={jetBrainsMono.variable}>
+      <body className={`${nunito.className} antialiased`}>
         {children}
         <Toaster />
       </body>
