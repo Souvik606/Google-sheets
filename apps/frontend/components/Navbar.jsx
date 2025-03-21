@@ -98,7 +98,7 @@ const Navbar = () => {
             </div>
             {query && (
               <button onClick={clearSearch} className="absolute right-4">
-                <X className="h-6 w-6 text-gray-500 transition hover:text-red-500" />
+                <X className="h-6 w-6 text-gray-500 !transition-none hover:text-red-500" />
               </button>
             )}
           </div>
