@@ -62,6 +62,7 @@ export default function Home() {
     data: sheets,
     isLoading: isSheetsFetchLoading,
     isSuccess: isSheetsFetched,
+    isFetching: isSheetsFetching,
     refetch,
   } = useQuery({
     queryFn: async () => {
@@ -160,7 +161,7 @@ export default function Home() {
             className="cursor-pointer rounded-full px-0.5"
           >
             <RefreshCw
-              className={`size-5 !transition-none hover:text-green-700 ${isSheetsFetchLoading && "animate-spin"}`}
+              className={`size-5 !transition-none hover:text-green-700 ${isSheetsFetching && "animate-spin"}`}
             />
           </button>
         </div>
@@ -198,11 +199,11 @@ export default function Home() {
                       height={40}
                       className="size-5"
                     />
-                    <span className="line-clamp-1 max-w-prose font-semibold overflow-ellipsis text-gray-900 dark:text-gray-100">
+                    <span className="max-w-[50ch] truncate font-semibold text-gray-900 dark:text-gray-100">
                       {item.spreadsheet_name}
                     </span>
                   </div>
-                  <span className="w-1/4 pl-1 font-medium text-gray-700 dark:text-gray-300">
+                  <span className="w-1/4 max-w-[50ch] truncate pl-1 font-medium text-gray-700 dark:text-gray-300">
                     {item.owner_id === userId ? "me" : item.owner_name}
                   </span>
                   <span className="w-1/4 font-medium text-gray-700 dark:text-gray-300">

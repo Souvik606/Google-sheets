@@ -95,7 +95,7 @@ const Navbar = () => {
               onChange={(e) => setQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 400)}
-              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-2 text-lg shadow-teal-300/40 transition-all placeholder:translate-y-0.5 placeholder:align-baseline placeholder:text-sm placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
+              className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-2 text-lg shadow-teal-300/40 transition-all placeholder:align-baseline placeholder:text-sm placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
             />
             <div className="pointer-events-none absolute left-3 flex items-center">
               <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
@@ -131,10 +131,10 @@ const Navbar = () => {
                         className="size-5"
                       />
                       <div className="flex flex-col">
-                        <span className="font-semibold text-gray-900 dark:text-gray-100">
+                        <span className="max-w-[40ch] truncate font-semibold text-gray-900 dark:text-gray-100">
                           {item.spreadsheet_name}
                         </span>
-                        <span className="text-sm font-light text-gray-700 dark:text-gray-200">
+                        <span className="max-w-[50ch] truncate text-sm font-light text-gray-700 dark:text-gray-200">
                           {item.owner_name}
                         </span>
                       </div>
