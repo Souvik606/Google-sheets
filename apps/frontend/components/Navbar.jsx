@@ -14,6 +14,7 @@ const Navbar = () => {
   const [theme, setTheme] = useState("light");
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
@@ -91,6 +92,8 @@ const Navbar = () => {
               placeholder="Search..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setTimeout(() => setIsSearchFocused(false), 400)}
               className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-3 text-xl shadow-teal-300/40 transition-all placeholder:translate-y-0.5 placeholder:align-baseline placeholder:text-lg placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
             />
             <div className="pointer-events-none absolute left-4 flex items-center">
@@ -103,7 +106,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {query && (
+          {query && isSearchFocused && (
             <div className="absolute z-10 mt-2 w-full rounded-lg bg-white p-4 shadow-lg dark:bg-gray-800">
               {isSheetsFetchLoading ? (
                 <p className="text-gray-500 dark:text-gray-400">Loading...</p>
