@@ -102,14 +102,14 @@ export default function Home() {
 
       {/* New Spreadsheet */}
       <section className="mx-auto max-w-7xl px-6 pt-8">
-        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+        <h2 className="text-center text-xl font-bold text-gray-800 dark:text-gray-200">
           Start a new spreadsheet
         </h2>
-        <div className="pt-3">
+        <div className="flex items-center justify-center pt-3">
           <Button
             onClick={createSheet}
             disabled={isPending}
-            className="flex h-30 w-30 cursor-pointer items-center justify-center rounded-none border-2 bg-white shadow-md saturate-0 transition-all hover:border-teal-300 hover:bg-teal-50 hover:shadow-lg hover:saturate-100 dark:border-gray-700 dark:bg-zinc-800 dark:hover:border-teal-50/70 dark:hover:bg-zinc-900"
+            className="flex h-35 w-45 cursor-pointer items-center justify-center rounded-sm border-2 bg-white shadow-md saturate-0 transition-all hover:border-teal-300 hover:bg-teal-50 hover:shadow-lg hover:saturate-100 dark:border-gray-700 dark:bg-zinc-800 dark:hover:border-teal-50/70 dark:hover:bg-zinc-900"
           >
             <Image
               src="/app-icons/plus.png"
