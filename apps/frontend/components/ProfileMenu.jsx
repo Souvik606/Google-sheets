@@ -36,13 +36,13 @@ export function ProfileMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="size-10 cursor-pointer rounded-full">
+        <Avatar className="size-8 cursor-pointer rounded-full">
           <AvatarImage
             src={profileIcon}
             alt="@rahulc0dy"
             className="cursor-pointer transition-transform duration-300 hover:scale-125"
           />
-          <AvatarFallback>
+          <AvatarFallback className={"bg-teal-800/20 hover:text-teal-700"}>
             <UserIcon />
           </AvatarFallback>
         </Avatar>
