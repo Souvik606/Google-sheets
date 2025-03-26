@@ -28,6 +28,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useAuth } from "@/providers/AuthProvider";
+import { Settings2Icon } from "lucide-react";
 
 export function ProfileMenu() {
   const { logout, auth } = useAuth();
@@ -53,70 +54,34 @@ export function ProfileMenu() {
           </Tooltip>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mr-7 w-60 font-medium">
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User />
-            <span>Profile</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Settings />
-            <span>Settings</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Users />
-            <span>Team</span>
-          </DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>
-              <UserPlus
-                className={"mr-2 size-4 text-gray-500"}
-                strokeWidth={2}
-              />
-              <span>Invite users</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>
-                  <Mail />
-                  <span>Email</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <MessageSquare />
-                  <span>Message</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <PlusCircle />
-                  <span>More...</span>
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>
-            <Plus />
-            <span>New Team</span>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Github />
-          <span>GitHub</span>
+      <DropdownMenuContent className="mr-7 w-60 rounded-2xl bg-gray-50/50 p-4 shadow-lg backdrop-blur-md dark:bg-slate-900/50 dark:text-white dark:shadow-white/20">
+        <div className="mt-3 flex flex-col items-center">
+          <Avatar className="size-14 border border-gray-300">
+            <AvatarImage src={profileIcon} alt={name} />
+            <AvatarFallback className="bg-teal-800/20 dark:bg-gray-100/20">
+              <UserIcon />
+            </AvatarFallback>
+          </Avatar>
+          <p className="mt-2 text-lg font-semibold text-gray-900 dark:text-white">
+            Hi, {name}!
+          </p>
+          <p className="text-center text-sm font-medium text-gray-700 dark:text-gray-200">
+            {email}
+          </p>
+        </div>
+
+        <DropdownMenuSeparator className="my-3" />
+
+        <DropdownMenuItem className="flex items-center px-4 py-2 hover:bg-gray-100">
+          <Settings />
+          <span>Settings</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <LifeBuoy />
-          <span>Support</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem disabled>
-          <Cloud />
-          <span>API</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>
-          <LogOut />
+
+        <DropdownMenuItem
+          onClick={logout}
+          className="flex items-center px-4 py-2 hover:bg-gray-100"
+        >
+          <LogOut className="size-4" />
           <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
