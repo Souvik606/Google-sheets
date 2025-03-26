@@ -26,26 +26,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { useAuth } from "@/providers/AuthProvider";
 
 export function ProfileMenu() {
   const { logout, auth } = useAuth();
 
   const profileIcon = auth?.user?.profile_icon;
-
+  const name = auth?.user?.name;
+  const email = auth?.user?.email;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar className="size-8 cursor-pointer rounded-full">
-          <AvatarImage
-            src={profileIcon}
-            alt="@rahulc0dy"
-            className="cursor-pointer transition-transform duration-300 hover:scale-125"
-          />
-          <AvatarFallback className={"bg-teal-800/20 hover:text-teal-700"}>
-            <UserIcon />
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Tooltip text={`${name}\n${email}`}>
+            <Avatar className="size-8 cursor-pointer rounded-full">
+              <AvatarImage
+                src={profileIcon}
+                alt={name}
+                className="cursor-pointer transition-transform duration-300 hover:scale-110"
+              />
+              <AvatarFallback className="bg-teal-800/20 hover:text-teal-700">
+                <UserIcon />
+              </AvatarFallback>
+            </Avatar>
+          </Tooltip>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-7 w-60 font-medium">
         <DropdownMenuGroup>
