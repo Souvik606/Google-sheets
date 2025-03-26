@@ -1,104 +1,57 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import React from "react";
-import { CircleAlertIcon, CircleCheckIcon, PlusIcon } from "lucide-react";
-
+import React, { useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  CircleAlertIcon,
+  CircleCheckIcon,
+  EditIcon,
+  MoreVertical,
+  Plus,
+  RefreshCw,
+  SquareArrowOutUpRight,
+  Trash2Icon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  createSheetService,
-  getAllSheetsService,
-} from "@/services/spreadsheetServices";
 import { toast } from "sonner";
-import { redirect } from "next/dist/server/api-utils";
-
-const tableData = [
-  {
-    groupName: "Yesterday",
-    items: [
-      {
-        name: "Monthly Expenses 2025",
-        ownedBy: "me",
-        lastOpened: "Mar 16, 2025",
-      },
-      {
-        name: "MPP Lab Teams",
-        ownedBy: "me",
-        lastOpened: "Mar 16, 2025",
-      },
-      {
-        name: "Mini Project_6th_sem_2024",
-        ownedBy: "Ninja Hattori",
-        lastOpened: "Mar 16, 2025",
-      },
-    ],
-  },
-  {
-    groupName: "Previous 30 days",
-    items: [
-      {
-        name: "Attendance",
-        ownedBy: "me",
-        lastOpened: "Feb 19, 2025",
-      },
-      {
-        name: "Code Conduct Registration Form (Responses)",
-        ownedBy: "me",
-        lastOpened: "Feb 19, 2025",
-      },
-    ],
-  },
-  {
-    groupName: "Earlier",
-    items: [
-      {
-        name: "Due of post Boarders (Mess)_2022",
-        ownedBy: "Arnab",
-        lastOpened: "Jan 16, 2025",
-      },
-      {
-        name: "REF 2025 Payment sheet.xlsx",
-        ownedBy: "me",
-        lastOpened: "Dec 29, 2024",
-      },
-    ],
-  },
-];
+import api from "@/lib/api";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/providers/AuthProvider";
 
 export default function Home() {
-  const {
-    mutate: createSheet,
+  const [ownerFilter, setOwnerFilter] = useState("anyone");
+  const [showRenameDialog, setShowRenameDialog] = useState(false);
+  const [initialName, setInitialName] = useState("");
+  const [selectedSpreadsheetId, setSelectedSpreadsheetId] = useState("");
 
-    isPending,
-  } = useMutation({
-    mutationFn: () => createSheetService(),
+  const router = useRouter();
+  const { auth } = useAuth();
+
+  const userId = auth.user.user_id;
+
+  const { mutate: createSheet, isPending } = useMutation({
+    mutationFn: async () => {
+      const response = await api.post("/spreadsheet/create");
+      return response.data;
+    },
     mutationKey: ["CreateSheet"],
     onSuccess: (res) => {
       toast(res.message, {
         icon: <CircleCheckIcon className="text-emerald-500" />,
         dismissible: true,
       });
-      redirect("/sheets/");
+      refetch();
     },
     onError: (err) => {
-      console.log(err);
       toast(err.response ? err.response.data.message : err.message, {
         icon: <CircleAlertIcon className="text-rose-500" />,
         dismissible: true,
@@ -108,94 +61,228 @@ export default function Home() {
 
   const {
     data: sheets,
-    isLoading,
-    isSuccess,
+    isLoading: isSheetsFetchLoading,
+    isSuccess: isSheetsFetched,
+    isFetching: isSheetsFetching,
+    refetch,
   } = useQuery({
-    queryFn: () => getAllSheetsService(),
-    queryKey: ["CreateSheet"],
+    queryFn: async () => {
+      const response = await api.get("/spreadsheet");
+      return response.data;
+    },
+    queryKey: ["GetAllSheets"],
   });
-  isSuccess && console.log(sheets);
-  const onSubmit = (data) => {
-    createSheet();
-  };
+
+  const { mutate: deleteSpreadSheet, isPending: isSpreadSheetDeletePending } =
+    useMutation({
+      mutationFn: async ({ spreadSheetId }) => {
+        const response = await api.delete(
+          `/spreadsheet/${spreadSheetId}/delete`
+        );
+        return response.data;
+      },
+      mutationKey: ["DeleteSpreadSheet"],
+      onSuccess: (res) => {
+        toast(res.message, {
+          icon: <CircleCheckIcon className="text-emerald-500" />,
+          dismissible: true,
+        });
+        refetch();
+      },
+      onError: (err) => {
+        toast(err.response ? err.response.data.message : err.message, {
+          icon: <CircleAlertIcon className="text-rose-500" />,
+          dismissible: true,
+        });
+      },
+    });
 
   return (
     <>
       <Navbar />
 
       {/* New Spreadsheet */}
-      <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
-        <h2 className={"text-lg font-semibold text-gray-600"}>
-          Start a new sheet
+      <section className="mx-auto max-w-7xl px-6 pt-8">
+        <h2 className="text-center text-xl font-bold text-gray-800 dark:text-gray-200">
+          Start a new spreadsheet
         </h2>
-        <div className={"flex items-center gap-3 py-3"}>
+        <div className="flex items-center justify-center pt-3">
           <Button
-            onClick={onSubmit}
+            onClick={createSheet}
             disabled={isPending}
-            className={
-              "flex aspect-square w-40 cursor-pointer items-center justify-center rounded-lg border border-gray-400 bg-gradient-to-br from-teal-50 to-teal-100 hover:border-teal-200 hover:to-teal-300"
-            }
+            className="flex h-35 w-45 cursor-pointer items-center justify-center rounded-sm border-2 bg-white text-teal-700 shadow-md !transition-none hover:border-teal-300 hover:bg-teal-50 hover:text-teal-900 hover:shadow-lg dark:border-gray-700 dark:bg-zinc-800 dark:text-cyan-500 dark:hover:border-teal-50/70 dark:hover:bg-zinc-900 dark:hover:text-cyan-300"
           >
-            <PlusIcon
-              strokeWidth={2}
-              size={100}
-              className={"text-teal-800/70"}
-            />
+            <Plus className="size-10 h-3/4 w-3/4 object-contain !transition-none hover:text-cyan-300" />
           </Button>
         </div>
       </section>
 
-      <section className={"mx-auto max-w-7xl px-2 py-4 2xl:px-0"}>
-        <div className="flex items-center justify-between">
-          <h2 className={"text-lg font-semibold text-gray-600"}>My sheets</h2>
-          <div></div>
+      {/* Sheets List */}
+      <section className="mx-auto max-w-7xl px-6 py-8">
+        <div className="flex items-center justify-between pb-8 text-gray-700 dark:text-gray-300">
+          <h2 className="text-xl font-bold">My Sheets</h2>
         </div>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-1/2">Name</TableHead>
-              <TableHead>
-                <Select>
-                  <SelectTrigger
-                    size={"default"}
-                    className={
-                      "cursor-pointer border-none p-0 shadow-none focus:border-none focus:outline-none focus-visible:shadow-none focus-visible:ring-0"
+        <div className="flex items-center bg-teal-50 px-4 py-1 text-lg text-gray-600 dark:bg-slate-800/50 dark:text-gray-400">
+          <span className="flex-1 font-semibold">Name</span>
+          <span className="w-1/4 font-semibold">
+            <select
+              value={ownerFilter}
+              onChange={(e) => setOwnerFilter(e.target.value)}
+              className="cursor-pointer rounded-lg px-0 py-2 font-semibold focus:outline-none"
+            >
+              <option
+                value="anyone"
+                className="dark:focus-visible::bg-slate-800 dark:bg-zinc-700 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:text-white"
+              >
+                Owned by anyone
+              </option>
+              <option
+                value="me"
+                className="dark:focus-visible::bg-slate-800 dark:bg-zinc-700 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:text-white"
+              >
+                Owned by me
+              </option>
+              <option
+                value="not-me"
+                className="dark:focus-visible::bg-slate-800 dark:bg-zinc-700 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:text-white"
+              >
+                Not owned by me
+              </option>
+            </select>
+          </span>
+          <span className="w-1/4 font-semibold">Last edited</span>
+          <button
+            onClick={() => refetch()}
+            className="cursor-pointer rounded-full px-0.5"
+          >
+            <RefreshCw
+              className={`size-5 !transition-none hover:text-green-700 ${isSheetsFetching && "animate-spin"}`}
+            />
+          </button>
+        </div>
+        <div>
+          {isSheetsFetchLoading ? (
+            <p className="text-lg text-gray-500 dark:text-gray-400">
+              Loading...
+            </p>
+          ) : (
+            isSheetsFetched &&
+            sheets.data
+              .filter((sheet) => {
+                if (ownerFilter === "me") {
+                  return sheet.owner_id === userId;
+                } else if (ownerFilter === "not-me") {
+                  return sheet.owner_id !== userId;
+                }
+                return true;
+              })
+              .map((item) => (
+                <div
+                  key={item.spreadsheet_id}
+                  className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900/50"
+                >
+                  <div
+                    className="flex flex-1 items-center gap-6"
+                    onClick={() =>
+                      router.push(`/sheets/${item.spreadsheet_id}`)
                     }
                   >
-                    <SelectValue placeholder="Owned by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="anyone">Owned by anyone</SelectItem>
-                      <SelectItem value="me">Owned by me</SelectItem>
-                      <SelectItem value="not-me">Not owned by me</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </TableHead>
-              <TableHead>Last opened by me</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell>Loading...</TableCell>
-                <TableCell>Loading...</TableCell>
-                <TableCell>Loading...</TableCell>
-              </TableRow>
-            ) : (
-              isSuccess &&
-              sheets.data.map((item) => (
-                <TableRow key={item.spreadsheet_id}>
-                  <TableCell>{item.spreadsheet_name}</TableCell>
-                  <TableCell>{item.owner_id}</TableCell>
-                  <TableCell>{item.last_edited_at}</TableCell>
-                </TableRow>
+                    <Image
+                      src="/assets/images/sheets-icon.png"
+                      alt="Logo"
+                      width={40}
+                      height={40}
+                      className="size-5"
+                    />
+                    <span className="w-2/3 max-w-[50ch] truncate font-semibold text-gray-900 dark:text-gray-100">
+                      {item.spreadsheet_name}
+                    </span>
+                  </div>
+                  <span className="w-1/4 max-w-[50ch] truncate pl-1 font-medium text-gray-700 dark:text-gray-300">
+                    {item.owner_id === userId ? "me" : item.owner_name}
+                  </span>
+                  <span className="w-1/4 font-medium text-gray-700 dark:text-gray-300">
+                    {(() => {
+                      const editedDate = new Date(item.last_edited_at);
+                      const today = new Date();
+
+                      const isToday =
+                        editedDate.getDate() === today.getDate() &&
+                        editedDate.getMonth() === today.getMonth() &&
+                        editedDate.getFullYear() === today.getFullYear();
+
+                      return isToday
+                        ? editedDate.toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                        : editedDate.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          });
+                    })()}
+                  </span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <MoreVertical
+                        className={
+                          "cursor-pointer text-gray-500 transition-none hover:text-zinc-800 focus-visible:outline-none dark:hover:text-zinc-200"
+                        }
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => {
+                          setInitialName(item.spreadsheet_name);
+                          setSelectedSpreadsheetId(item.spreadsheet_id);
+                          setShowRenameDialog(true);
+                        }}
+                      >
+                        <EditIcon />
+                        <span>Rename</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() =>
+                          deleteSpreadSheet({
+                            spreadSheetId: item.spreadsheet_id,
+                          })
+                        }
+                      >
+                        <Trash2Icon />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() =>
+                          window.open(
+                            `/sheets/${item.spreadsheet_id}`,
+                            "_blank",
+                            "noopener,noreferrer"
+                          )
+                        }
+                      >
+                        <SquareArrowOutUpRight />
+                        <span>Open in new tab</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               ))
-            )}
-          </TableBody>
-        </Table>
+          )}
+        </div>
       </section>
+
+      <RenameSpreadsheetDialog
+        open={showRenameDialog}
+        onOpenChange={setShowRenameDialog}
+        initialName={initialName}
+        sheetId={selectedSpreadsheetId}
+        onRenameSuccess={refetch}
+      />
     </>
   );
 }

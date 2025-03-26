@@ -15,7 +15,8 @@ const ProtectedRoute = ({ children }) => {
     }
   }, [auth, router]);
 
-  if (auth.loading) return <p>Loading...</p>;
+  if (auth.loading)
+    return <div className={"flex items-center justify-center"}>Loading...</div>;
 
   // If authenticated, render the protected content
   return auth.isAuthenticated ? children : null;

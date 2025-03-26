@@ -9,6 +9,7 @@ import {
   PlusCircle,
   Settings,
   User,
+  UserIcon,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -25,41 +26,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tooltip } from "@/components/ui/Tooltip";
 import { useAuth } from "@/providers/AuthProvider";
-import { useState, useEffect } from "react";
 
 export function ProfileMenu() {
-  const { logout } = useAuth();
-  const [userData, setUserData] = useState(null);
+  const { logout, auth } = useAuth();
 
-  useEffect(() => {
-    const storedData = localStorage.getItem("auth");
-    if (storedData) {
-      console.log("storedData", storedData);
-      const tempData = JSON.parse(storedData);
-      setUserData(tempData.user);
-    }
-  }, []);
-
+  const profileIcon = auth?.user?.profile_icon;
+  const name = auth?.user?.name;
+  const email = auth?.user?.email;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Avatar>
-          {userData ? (
-            <AvatarImage
-              src={userData.profile_icon}
-              alt="@rahulc0dy"
-              className="cursor-pointer transition-transform duration-300 hover:scale-125"
-            />
-          ) : (
-            <AvatarImage
-              src="https://placehold.co/50x50"
-              alt="@rahulc0dy"
-              className="cursor-pointer transition-transform duration-300 hover:scale-125"
-            />
-          )}
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+        <div className="relative">
+          <Tooltip text={`${name}\n${email}`}>
+            <Avatar className="size-8 cursor-pointer rounded-full">
+              <AvatarImage
+                src={profileIcon}
+                alt={name}
+                className="cursor-pointer transition-transform duration-300 hover:scale-110"
+              />
+              <AvatarFallback className="bg-teal-800/20 hover:text-teal-700">
+                <UserIcon />
+              </AvatarFallback>
+            </Avatar>
+          </Tooltip>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="mr-7 w-60 font-medium">
         <DropdownMenuGroup>

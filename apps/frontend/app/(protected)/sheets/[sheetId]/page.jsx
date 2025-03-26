@@ -1,7 +1,8 @@
 import React from "react";
 
-const page = () => {
-  return <div></div>;
+const page = async ({ params }) => {
+  const { sheetId } = await params;
+  return <div>{sheetId}</div>;
 };
 
 export default page;
