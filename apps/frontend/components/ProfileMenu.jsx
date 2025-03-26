@@ -1,34 +1,14 @@
-import {
-  Cloud,
-  Github,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserIcon,
-  UserPlus,
-  Users,
-} from "lucide-react";
+import { LogOut, Settings, UserIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useAuth } from "@/providers/AuthProvider";
-import { Settings2Icon } from "lucide-react";
 
 export function ProfileMenu() {
   const { logout, auth } = useAuth();
