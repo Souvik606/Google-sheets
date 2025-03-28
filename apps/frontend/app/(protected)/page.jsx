@@ -23,6 +23,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
+
 import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/providers/AuthProvider";
@@ -32,6 +42,7 @@ export default function Home() {
   const [showRenameDialog, setShowRenameDialog] = useState(false);
   const [initialName, setInitialName] = useState("");
   const [selectedSpreadsheetId, setSelectedSpreadsheetId] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const router = useRouter();
   const { auth } = useAuth();
@@ -162,116 +173,141 @@ export default function Home() {
         </div>
         <div>
           {isSheetsFetchLoading ? (
-            <p className="text-lg text-gray-500 dark:text-gray-400">
-              Loading...
-            </p>
+            <p className="text-lg text-gray-500 dark:text-gray-400">Loading...</p>
           ) : (
-            isSheetsFetched &&
-            sheets.data
-              .filter((sheet) => {
-                if (ownerFilter === "me") {
-                  return sheet.owner_id === userId;
-                } else if (ownerFilter === "not-me") {
-                  return sheet.owner_id !== userId;
-                }
-                return true;
-              })
-              .map((item) => (
-                <div
-                  key={item.spreadsheet_id}
-                  className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900/50"
-                >
-                  <div
-                    className="flex flex-1 items-center gap-6"
-                    onClick={() =>
-                      router.push(`/sheets/${item.spreadsheet_id}`)
+            isSheetsFetched && (
+              <>
+                {sheets.data
+                  .filter((sheet) => {
+                    if (ownerFilter === "me") {
+                      return sheet.owner_id === userId;
+                    } else if (ownerFilter === "not-me") {
+                      return sheet.owner_id !== userId;
                     }
-                  >
-                    <Image
-                      src="/assets/images/sheets-icon.png"
-                      alt="Logo"
-                      width={40}
-                      height={40}
-                      className="size-5"
-                    />
-                    <span className="w-2/3 max-w-[50ch] truncate font-semibold text-gray-900 dark:text-gray-100">
-                      {item.spreadsheet_name}
-                    </span>
-                  </div>
-                  <span className="w-1/4 max-w-[50ch] truncate pl-1 font-medium text-gray-700 dark:text-gray-300">
-                    {item.owner_id === userId ? "me" : item.owner_name}
-                  </span>
-                  <span className="w-1/4 font-medium text-gray-700 dark:text-gray-300">
-                    {(() => {
-                      const editedDate = new Date(item.last_edited_at);
-                      const today = new Date();
-
-                      const isToday =
-                        editedDate.getDate() === today.getDate() &&
-                        editedDate.getMonth() === today.getMonth() &&
-                        editedDate.getFullYear() === today.getFullYear();
-
-                      return isToday
-                        ? editedDate.toLocaleTimeString("en-US", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          })
-                        : editedDate.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          });
-                    })()}
-                  </span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <MoreVertical
-                        className={
-                          "cursor-pointer text-gray-500 transition-none hover:text-zinc-800 focus-visible:outline-none dark:hover:text-zinc-200"
-                        }
+                    return true;
+                  })
+                  .slice((currentPage - 1) * 15, currentPage * 15)
+                  .map((item) => (
+                    <div
+                      key={item.spreadsheet_id}
+                      className="flex cursor-pointer items-center justify-between border-b px-4 py-5 hover:bg-gray-100 dark:hover:bg-slate-900/50"
+                    >
+                      <div
+                        className="flex flex-1 items-center gap-6"
+                        onClick={() => router.push(`/sheets/${item.spreadsheet_id}`)}
+                      >
+                        <Image
+                          src="/assets/images/sheets-icon.png"
+                          alt="Logo"
+                          width={40}
+                          height={40}
+                          className="size-5"
+                        />
+                        <span className="w-2/3 max-w-[50ch] truncate font-semibold text-gray-900 dark:text-gray-100">
+                          {item.spreadsheet_name}
+                        </span>
+                      </div>
+                      <span className="w-1/4 max-w-[50ch] truncate pl-1 font-medium text-gray-700 dark:text-gray-300">
+                        {item.owner_id === userId ? "me" : item.owner_name}
+                      </span>
+                      <span className="w-1/4 font-medium text-gray-700 dark:text-gray-300">
+                        {(() => {
+                          const editedDate = new Date(item.last_edited_at);
+                          const today = new Date();
+                          const isToday =
+                            editedDate.getDate() === today.getDate() &&
+                            editedDate.getMonth() === today.getMonth() &&
+                            editedDate.getFullYear() === today.getFullYear();
+                          return isToday
+                            ? editedDate.toLocaleTimeString("en-US", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                            : editedDate.toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            });
+                        })()}
+                      </span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <MoreVertical className="cursor-pointer text-gray-500 transition-none hover:text-zinc-800 focus-visible:outline-none dark:hover:text-zinc-200" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setInitialName(item.spreadsheet_name);
+                              setSelectedSpreadsheetId(item.spreadsheet_id);
+                              setShowRenameDialog(true);
+                            }}
+                          >
+                            <EditIcon />
+                            <span>Rename</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() =>
+                              deleteSpreadSheet({ spreadSheetId: item.spreadsheet_id })
+                            }
+                          >
+                            <Trash2Icon />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="cursor-pointer"
+                            onClick={() =>
+                              window.open(
+                                `/sheets/${item.spreadsheet_id}`,
+                                "_blank",
+                                "noopener,noreferrer"
+                              )
+                            }
+                          >
+                            <SquareArrowOutUpRight />
+                            <span>Open in new tab</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  ))}
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                       />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setInitialName(item.spreadsheet_name);
-                          setSelectedSpreadsheetId(item.spreadsheet_id);
-                          setShowRenameDialog(true);
-                        }}
-                      >
-                        <EditIcon />
-                        <span>Rename</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
+                    </PaginationItem>
+                    {Array.from({ length: Math.ceil(sheets.data.length / 15) }).map(
+                      (_, index) => (
+                        <PaginationItem key={index}>
+                          <PaginationLink
+                            href="#"
+                            isActive={index + 1 === currentPage}
+                            onClick={() => setCurrentPage(index + 1)}
+                          >
+                            {index + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      )
+                    )}
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
                         onClick={() =>
-                          deleteSpreadSheet({
-                            spreadSheetId: item.spreadsheet_id,
-                          })
-                        }
-                      >
-                        <Trash2Icon />
-                        <span>Delete</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() =>
-                          window.open(
-                            `/sheets/${item.spreadsheet_id}`,
-                            "_blank",
-                            "noopener,noreferrer"
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, Math.ceil(sheets.data.length / 15))
                           )
                         }
-                      >
-                        <SquareArrowOutUpRight />
-                        <span>Open in new tab</span>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              ))
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </>
+            )
           )}
         </div>
       </section>
