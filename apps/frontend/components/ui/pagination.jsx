@@ -81,6 +81,26 @@ const PaginationEllipsis = ({ className, ...props }) => (
 );
 PaginationEllipsis.displayName = "PaginationEllipsis";
 
+const PaginationRowsPerPage = ({ className, rowsPerPage, setRowsPerPage, ...props }) => {
+  return (
+    <div className={cn("flex items-center gap-2 text-gray-700 dark:text-gray-300", className)}>
+      <span aria-hidden className={cn("text-sm", className)} {...props}>Rows per page</span>
+      <select
+        className="h-8 w-16 rounded-md border border-gray-400 bg-transparent px-2 text-sm outline-none dark:border-gray-600"
+        value={rowsPerPage}
+        onChange={(e) => setRowsPerPage(Number(e.target.value))}
+      >
+        {[10, 20, 30, 50].map((num) => (
+          <option key={num} value={num}>
+            {num}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+
 export {
   Pagination,
   PaginationContent,
@@ -89,4 +109,5 @@ export {
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
+  PaginationRowsPerPage
 };

@@ -31,6 +31,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationRowsPerPage
 } from "@/components/ui/pagination"
 
 import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
@@ -43,6 +44,7 @@ export default function Home() {
   const [initialName, setInitialName] = useState("");
   const [selectedSpreadsheetId, setSelectedSpreadsheetId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const router = useRouter();
   const { auth } = useAuth();
@@ -186,7 +188,7 @@ export default function Home() {
                     }
                     return true;
                   })
-                  .slice((currentPage - 1) * 15, currentPage * 15)
+                  .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
                   .map((item) => (
                     <div
                       key={item.spreadsheet_id}
@@ -273,7 +275,8 @@ export default function Home() {
                       </DropdownMenu>
                     </div>
                   ))}
-                <Pagination>
+                <Pagination className="mt-4">
+                  <PaginationRowsPerPage rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} className="mr-2"/>
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
@@ -281,7 +284,7 @@ export default function Home() {
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                       />
                     </PaginationItem>
-                    {Array.from({ length: Math.ceil(sheets.data.length / 15) }).map(
+                    {Array.from({ length: Math.ceil(sheets.data.length / rowsPerPage) }).map(
                       (_, index) => (
                         <PaginationItem key={index}>
                           <PaginationLink
@@ -299,7 +302,7 @@ export default function Home() {
                         href="#"
                         onClick={() =>
                           setCurrentPage((prev) =>
-                            Math.min(prev + 1, Math.ceil(sheets.data.length / 15))
+                            Math.min(prev + 1, Math.ceil(sheets.data.length /rowsPerPage))
                           )
                         }
                       />
