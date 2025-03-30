@@ -34,7 +34,7 @@ export function ProfileMenu() {
           </Tooltip>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="mr-7 w-60 rounded-2xl bg-gray-50/50 p-4 shadow-lg backdrop-blur-md dark:bg-slate-900/50 dark:text-white dark:shadow-white/20">
+      <DropdownMenuContent className="mr-7 w-60 rounded-2xl bg-gray-50/50 p-4 shadow-lg backdrop-blur-md dark:bg-slate-900/50 dark:text-white dark:shadow-slate-500/20">
         <div className="mt-3 flex flex-col items-center">
           <Avatar className="size-14 border border-gray-300">
             <AvatarImage src={profileIcon} alt={name} />
@@ -52,14 +52,14 @@ export function ProfileMenu() {
 
         <DropdownMenuSeparator className="my-3" />
 
-        <DropdownMenuItem className="flex items-center px-4 py-2 hover:bg-gray-100">
+        <DropdownMenuItem className="flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100">
           <Settings />
           <span>Settings</span>
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={logout}
-          className="flex items-center px-4 py-2 hover:bg-gray-100"
+          className="flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100"
         >
           <LogOut className="size-4" />
           <span>Log out</span>

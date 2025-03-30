@@ -26,13 +26,12 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationRowsPerPage
-} from "@/components/ui/pagination"
+  PaginationRowsPerPage,
+} from "@/components/ui/pagination";
 
 import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
 import { useRouter } from "next/navigation";
@@ -175,7 +174,9 @@ export default function Home() {
         </div>
         <div>
           {isSheetsFetchLoading ? (
-            <p className="text-lg text-gray-500 dark:text-gray-400">Loading...</p>
+            <p className="text-lg text-gray-500 dark:text-gray-400">
+              Loading...
+            </p>
           ) : (
             isSheetsFetched && (
               <>
@@ -188,7 +189,10 @@ export default function Home() {
                     }
                     return true;
                   })
-                  .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                  .slice(
+                    (currentPage - 1) * rowsPerPage,
+                    currentPage * rowsPerPage
+                  )
                   .map((item) => (
                     <div
                       key={item.spreadsheet_id}
@@ -196,7 +200,9 @@ export default function Home() {
                     >
                       <div
                         className="flex flex-1 items-center gap-6"
-                        onClick={() => router.push(`/sheets/${item.spreadsheet_id}`)}
+                        onClick={() =>
+                          router.push(`/sheets/${item.spreadsheet_id}`)
+                        }
                       >
                         <Image
                           src="/assets/images/sheets-icon.png"
@@ -222,15 +228,15 @@ export default function Home() {
                             editedDate.getFullYear() === today.getFullYear();
                           return isToday
                             ? editedDate.toLocaleTimeString("en-US", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            })
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              })
                             : editedDate.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            });
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              });
                         })()}
                       </span>
                       <DropdownMenu>
@@ -252,7 +258,9 @@ export default function Home() {
                           <DropdownMenuItem
                             className="cursor-pointer"
                             onClick={() =>
-                              deleteSpreadSheet({ spreadSheetId: item.spreadsheet_id })
+                              deleteSpreadSheet({
+                                spreadSheetId: item.spreadsheet_id,
+                              })
                             }
                           >
                             <Trash2Icon />
@@ -276,33 +284,42 @@ export default function Home() {
                     </div>
                   ))}
                 <Pagination className="mt-4">
-                  <PaginationRowsPerPage rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} className="mr-2"/>
+                  <PaginationRowsPerPage
+                    rowsPerPage={rowsPerPage}
+                    setRowsPerPage={setRowsPerPage}
+                    className="mr-2"
+                  />
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
                         href="#"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
                       />
                     </PaginationItem>
-                    {Array.from({ length: Math.ceil(sheets.data.length / rowsPerPage) }).map(
-                      (_, index) => (
-                        <PaginationItem key={index}>
-                          <PaginationLink
-                            href="#"
-                            isActive={index + 1 === currentPage}
-                            onClick={() => setCurrentPage(index + 1)}
-                          >
-                            {index + 1}
-                          </PaginationLink>
-                        </PaginationItem>
-                      )
-                    )}
+                    {Array.from({
+                      length: Math.ceil(sheets.data.length / rowsPerPage),
+                    }).map((_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink
+                          href="#"
+                          isActive={index + 1 === currentPage}
+                          onClick={() => setCurrentPage(index + 1)}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
                     <PaginationItem>
                       <PaginationNext
                         href="#"
                         onClick={() =>
                           setCurrentPage((prev) =>
-                            Math.min(prev + 1, Math.ceil(sheets.data.length /rowsPerPage))
+                            Math.min(
+                              prev + 1,
+                              Math.ceil(sheets.data.length / rowsPerPage)
+                            )
                           )
                         }
                       />
