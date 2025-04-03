@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Moon, SearchIcon, Sun, X } from "lucide-react";
@@ -18,6 +18,7 @@ const Navbar = () => {
   const [filteredResults, setFilteredResults] = useState([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
+  const searchInputRef = useRef(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -69,6 +70,28 @@ const Navbar = () => {
     setFilteredResults([]);
   };
 
+  const goToSearchPage = () => {
+    if (query) {
+      router.push(`/search/${query}`);
+    }
+  };
+
+  useEffect(() => {
+    const searchInput = searchInputRef.current;
+    if (searchInput) {
+      const handleKeyDown = (event) => {
+        if (event.key === "Enter") {
+          goToSearchPage();
+        }
+      };
+      searchInput.addEventListener("keydown", handleKeyDown);
+
+      return () => {
+        searchInput.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [query]);
+
   return (
     <AuthProvider>
       <nav className="sticky top-0 z-50 flex items-center justify-between bg-slate-100 px-4 py-2 dark:bg-slate-800">
@@ -91,6 +114,8 @@ const Navbar = () => {
           <div className="relative flex w-full items-center">
             <Input
               type="text"
+              id="searchInput"
+              ref={searchInputRef}
               placeholder="Search..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -103,7 +128,7 @@ const Navbar = () => {
                 <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
               )}
               {query && (
-                <button onClick={() => router.push(`/search/${query}`)}>
+                <button onClick={goToSearchPage}>
                   <SearchIcon className="h-6 w-6 text-teal-600 !transition-none hover:text-teal-800 dark:text-gray-400 dark:hover:text-gray-100" />
                 </button>
               )}
