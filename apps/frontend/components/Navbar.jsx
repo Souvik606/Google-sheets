@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("dark");
   const [query, setQuery] = useState("");
   const [filteredResults, setFilteredResults] = useState([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -26,8 +26,8 @@ const Navbar = () => {
       setTheme(savedTheme);
       document.body.classList.toggle("dark", savedTheme === "dark");
     } else {
-      setTheme("light");
-      document.body.classList.remove("dark");
+      setTheme("dark");
+      document.body.classList.add("dark");
     }
   }, []);
 

@@ -103,7 +103,7 @@ const PaginationRowsPerPage = ({
         onChange={(e) => setRowsPerPage(Number(e.target.value))}
       >
         {[10, 20, 30, 50].map((num) => (
-          <option key={num} value={num}>
+          <option key={num} value={num} className="bg-white dark:bg-black">
             {num}
           </option>
         ))}

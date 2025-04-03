@@ -299,7 +299,16 @@ export default function Home() {
                       />
                     </PaginationItem>
                     {Array.from({
-                      length: Math.ceil(sheets.data.length / rowsPerPage),
+                      length: Math.ceil(
+                        sheets.data.filter((sheet) => {
+                          if (ownerFilter === "me") {
+                            return sheet.owner_id === userId;
+                          } else if (ownerFilter === "not-me") {
+                            return sheet.owner_id !== userId;
+                          }
+                          return true;
+                        }).length / rowsPerPage
+                      ),
                     }).map((_, index) => (
                       <PaginationItem key={index}>
                         <PaginationLink
@@ -318,7 +327,16 @@ export default function Home() {
                           setCurrentPage((prev) =>
                             Math.min(
                               prev + 1,
-                              Math.ceil(sheets.data.length / rowsPerPage)
+                              Math.ceil(
+                                sheets.data.filter((sheet) => {
+                                  if (ownerFilter === "me") {
+                                    return sheet.owner_id === userId;
+                                  } else if (ownerFilter === "not-me") {
+                                    return sheet.owner_id !== userId;
+                                  }
+                                  return true;
+                                }).length / rowsPerPage
+                              )
                             )
                           )
                         }
