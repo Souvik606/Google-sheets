@@ -98,8 +98,15 @@ const Navbar = () => {
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 400)}
               className="h-full w-full rounded-full border border-gray-400 bg-teal-50 px-12 py-2 text-lg shadow-teal-300/40 transition-all placeholder:align-baseline placeholder:text-sm placeholder:leading-none focus:border-teal-700 focus:ring-teal-500 focus:drop-shadow-lg focus-visible:ring-0 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:shadow-teal-600/60"
             />
-            <div className="pointer-events-none absolute left-3 flex items-center">
-              <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
+            <div className="absolute left-3 flex items-center">
+              {!query && (
+                <SearchIcon className="h-6 w-6 text-teal-600 dark:text-gray-400" />
+              )}
+              {query && (
+                <button onClick={() => router.push(`/search/${query}`)}>
+                  <SearchIcon className="h-6 w-6 text-teal-600 !transition-none hover:text-teal-800 dark:text-gray-400 dark:hover:text-gray-100" />
+                </button>
+              )}
             </div>
             {query && (
               <button onClick={clearSearch} className="absolute right-4">
