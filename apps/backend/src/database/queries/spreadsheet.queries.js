@@ -175,3 +175,30 @@ export const searchSpreadsheetsByNames = async (
     throw err;
   }
 };
+
+export const getSpreadsheetCount = async (userId, searchQuery) => {
+  try {
+    const result = await sql`
+    SELECT SUM(count) AS total_count FROM (
+      SELECT COUNT(*) AS count
+      FROM spreadsheets s
+      JOIN "users" u ON s.owner_id = u.user_id
+      WHERE s.owner_id = ${userId}
+      AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+           OR s.description ILIKE '%' || ${searchQuery} || '%')
+      UNION ALL
+      SELECT COUNT(*) AS count
+      FROM spreadsheets s
+      JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
+      JOIN "users" u ON s.owner_id = u.user_id
+      WHERE sa.user_id = ${userId}
+      AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+           OR s.description ILIKE '%' || ${searchQuery} || '%')
+    ) AS counts;
+    `;
+    return result[0].total_count || 0; // Return 0 if no rows are found
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};

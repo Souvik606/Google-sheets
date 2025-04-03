@@ -9,6 +9,7 @@ import {
   deleteSpreadsheet,
   getAllSheets,
   searchSpreadsheets,
+  countSpreadsheets,
 } from "../controllers/spreadsheet.controller.js";
 import { verifyOwner } from "../middlewares/spreadsheet.middleware.js";
 
@@ -16,6 +17,7 @@ const router = Router();
 
 router.route("/").get(verifyJWT, getSpreadsheets);
 router.route("/search").get(verifyJWT, searchSpreadsheets);
+router.route("/count").get(verifyJWT, countSpreadsheets);
 router.route("/create").post(verifyJWT, createSpreadsheet);
 router.route("/:spreadsheetId/").get(verifyJWT, getAllSheets);
 router

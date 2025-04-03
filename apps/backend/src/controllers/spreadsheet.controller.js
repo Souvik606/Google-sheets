@@ -17,6 +17,7 @@ import {
   deleteSpreadsheetById,
   fetchSheets,
   searchSpreadsheetsByNames,
+  getSpreadsheetCount,
 } from "../database/queries/spreadsheet.queries.js";
 import { addSheets } from "../database/queries/sheet.queries.js";
 import dayjs from "dayjs";
@@ -336,4 +337,29 @@ export const searchSpreadsheets = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.OK)
     .json(new ApiResponse(spreadsheets, "Successfully searched spreadsheets"));
+});
+
+export const countSpreadsheets = asyncHandler(async (req, res) => {
+  const session = req.session;
+  const searchQuery = req.query.query || "";
+  console.log("Session User ID:", session.user_id); // Debugging
+  console.log("Search Query:", searchQuery); // Debugging
+  let spreadsheetCount;
+
+  try {
+    spreadsheetCount = await getSpreadsheetCount(session.user_id, searchQuery);
+  } catch (err) {
+    console.error("Error in countSpreadsheets:", err); // Debugging
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while counting spreadsheets",
+      err
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(
+      new ApiResponse(spreadsheetCount, "Successfully counted spreadsheets")
+    );
 });
