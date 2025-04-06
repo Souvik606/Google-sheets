@@ -11,7 +11,10 @@ import {
   searchSpreadsheets,
   countSpreadsheets,
 } from "../controllers/spreadsheet.controller.js";
-import { verifyOwner } from "../middlewares/spreadsheet.middleware.js";
+import {
+  verifyAccess,
+  verifyOwner,
+} from "../middlewares/spreadsheet.middleware.js";
 
 const router = Router();
 
@@ -31,6 +34,6 @@ router
   .patch(verifyJWT, verifyOwner, updateSpreadsheetDescription);
 router
   .route("/:spreadsheetId/delete")
-  .delete(verifyJWT, verifyOwner, deleteSpreadsheet);
+  .delete(verifyJWT, verifyOwner, verifyAccess, deleteSpreadsheet);
 
 export default router;

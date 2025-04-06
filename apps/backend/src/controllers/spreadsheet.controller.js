@@ -18,6 +18,7 @@ import {
   fetchSheets,
   searchSpreadsheetsByNames,
   getSpreadsheetCount,
+  removeUserAccess,
 } from "../database/queries/spreadsheet.queries.js";
 import { addSheets } from "../database/queries/sheet.queries.js";
 import dayjs from "dayjs";
@@ -241,8 +242,10 @@ export const deleteSpreadsheet = asyncHandler(async (req, res) => {
 
   const spreadsheetId = req.params.spreadsheetId;
   const session = req.session;
+  const users = req.users;
+  const user = users.find((u) => u.user_id === session.user_id);
 
-  if (session.user_id !== req.ownerId) {
+  if (!user) {
     throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Unauthorized access");
   }
 
@@ -256,7 +259,14 @@ export const deleteSpreadsheet = asyncHandler(async (req, res) => {
   }
 
   try {
-    deletedSpreadsheet = await deleteSpreadsheetById(spreadsheetId);
+    if (session.user_id !== req.ownerId) {
+      deletedSpreadsheet = await removeUserAccess(
+        spreadsheetId,
+        session.user_id
+      );
+    } else {
+      deletedSpreadsheet = await deleteSpreadsheetById(spreadsheetId);
+    }
   } catch (err) {
     throw new ApiError(
       STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,

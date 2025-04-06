@@ -61,6 +61,19 @@ export const deleteSpreadsheetById = async (spreadsheetId) => {
   }
 };
 
+export const removeUserAccess = async (spreadsheetId, userId) => {
+  try {
+    await sql`
+        UPDATE sheet_access
+        SET wants = FALSE
+        WHERE sheet_id = ${spreadsheetId} AND user_id = ${userId}
+      `;
+    return { spreadsheet_id: spreadsheetId, status: "access_removed" };
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 export const updateUserAccess = async (spreadsheetId, usersArray) => {
   console.log("usersArray", usersArray);
   try {
@@ -88,10 +101,10 @@ export const updateUserAccess = async (spreadsheetId, usersArray) => {
     // Insert into Sheet_access table
     for (const { user_id, role } of userRoleArray) {
       const result = await sql`
-        INSERT INTO Sheet_access (sheet_id, user_id, role) 
-        VALUES (${spreadsheetId}, ${user_id}, ${role})
+        INSERT INTO Sheet_access (sheet_id, user_id, role, wants) 
+        VALUES (${spreadsheetId}, ${user_id}, ${role}, TRUE)
         ON CONFLICT (sheet_id, user_id) 
-        DO UPDATE SET role = EXCLUDED.role
+        DO UPDATE SET role = EXCLUDED.role, wants = TRUE
         RETURNING *;
       `;
 
@@ -117,7 +130,7 @@ export const getAllSpreadsheets = async (userId) => {
     FROM spreadsheets s
     JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
     JOIN "users" u ON s.owner_id = u.user_id
-    WHERE sa.user_id = ${userId}
+    WHERE sa.user_id = ${userId} AND sa.wants = TRUE
     ORDER BY last_edited_at DESC;
     `;
   } catch (err) {
@@ -164,7 +177,7 @@ export const searchSpreadsheetsByNames = async (
     FROM spreadsheets s
     JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
     JOIN "users" u ON s.owner_id = u.user_id
-    WHERE sa.user_id = ${userId}
+    WHERE sa.user_id = ${userId} AND sa.wants = TRUE
     AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
          OR s.description ILIKE '%' || ${searchQuery} || '%')
     ORDER BY last_edited_at DESC
