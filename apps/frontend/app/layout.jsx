@@ -15,7 +15,9 @@ const jetBrainsMono = JetBrains_Mono({
 export const metadata = {
   title: "Sheets",
   description: "Absolutely not google sheets. 😊",
-  icon: "/app-icons/favicon.ico",
+  icons: {
+    icon: "/app-icons/favicon.ico",
+  },
 };
 
 export default function RootLayout({ children }) {
