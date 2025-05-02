@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/AuthProvider";
+import { Tooltip } from "@/components/ui/Tooltip";
 
 const SearchPage = () => {
   const [ownerFilter, setOwnerFilter] = useState("anyone");
@@ -94,16 +95,18 @@ const SearchPage = () => {
             </select>
           </span>
           <span className="w-1/4 font-semibold">Last edited</span>
-          <button
-            onClick={() => refetch()}
-            className="cursor-pointer rounded-full px-0.5"
-          >
-            <RefreshCw
-              className={`size-5 !transition-none hover:text-green-700 ${
-                isSheetsFetching && "animate-spin"
-              }`}
-            />
-          </button>
+          <Tooltip text="Refresh" className="z-20 -translate-y-3">
+            <button
+              onClick={() => refetch()}
+              className="cursor-pointer rounded-full px-0.5"
+            >
+              <RefreshCw
+                className={`size-5 !transition-none hover:text-green-700 ${
+                  isSheetsFetching && "animate-spin"
+                }`}
+              />
+            </button>
+          </Tooltip>
         </div>
         <div>
           {isSheetsFetchLoading ? (
