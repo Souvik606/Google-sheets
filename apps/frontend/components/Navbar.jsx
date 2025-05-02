@@ -98,7 +98,7 @@ const Navbar = () => {
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <Image
-              src="/app-icons/android-chrome-192x192.png"
+              src="/assets/images/navbar-icon.png"
               alt="Logo"
               width={40}
               height={40}
