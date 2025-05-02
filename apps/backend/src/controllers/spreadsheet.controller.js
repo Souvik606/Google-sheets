@@ -14,7 +14,13 @@ import {
   getAllSpreadsheets,
   renameSpreadsheet,
   updateUserAccess,
+  deleteSpreadsheetById,
+  fetchSheets,
+  searchSpreadsheetsByNames,
+  getSpreadsheetCount,
+  removeUserAccess,
 } from "../database/queries/spreadsheet.queries.js";
+import { addSheets } from "../database/queries/sheet.queries.js";
 import dayjs from "dayjs";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -24,7 +30,9 @@ export const createSpreadsheet = asyncHandler(async (req, res) => {
 
   const currentTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
-  let spreadSheet;
+  let spreadSheet,
+    sheet,
+    sheetName = "Sheet1";
 
   try {
     spreadSheet = await addSpreadsheet(
@@ -45,6 +53,24 @@ export const createSpreadsheet = asyncHandler(async (req, res) => {
     throw new ApiError(
       STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
       "Failed to create spreadsheet"
+    );
+  }
+
+  try {
+    sheet = await addSheets(spreadSheet.spreadsheet_id, sheetName);
+  } catch (err) {
+    await deleteSpreadsheetById(spreadSheet.spreadsheet_id);
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while creating sheet",
+      err
+    );
+  }
+
+  if (!sheet) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to create sheet"
     );
   }
 
@@ -102,7 +128,7 @@ export const updateSpreadsheetName = asyncHandler(async (req, res) => {
   if (existingSpreadsheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 
@@ -147,7 +173,7 @@ export const updateSpreadsheetDescription = asyncHandler(async (req, res) => {
   if (existingSpreadsheet.length <= 0) {
     throw new ApiError(
       STATUS.CLIENT_ERROR.BAD_REQUEST,
-      "Invalid spreadsheet id"
+      "Invalid spreadsheet ID"
     );
   }
 
@@ -209,4 +235,141 @@ export const getSpreadsheets = asyncHandler(async (req, res) => {
   return res
     .status(STATUS.SUCCESS.OK)
     .json(new ApiResponse(spreadsheets, "Successfully fetched spreadsheets"));
+});
+
+export const deleteSpreadsheet = asyncHandler(async (req, res) => {
+  let deletedSpreadsheet;
+
+  const spreadsheetId = req.params.spreadsheetId;
+  const session = req.session;
+  const users = req.users;
+  const user = users.find((u) => u.user_id === session.user_id);
+
+  if (!user) {
+    throw new ApiError(STATUS.CLIENT_ERROR.UNAUTHORIZED, "Unauthorized access");
+  }
+
+  const existingSpreadsheet = await findSpreadsheetById(spreadsheetId);
+
+  if (existingSpreadsheet.length <= 0) {
+    throw new ApiError(
+      STATUS.CLIENT_ERROR.BAD_REQUEST,
+      "Invalid spreadsheet ID"
+    );
+  }
+
+  try {
+    if (session.user_id !== req.ownerId) {
+      deletedSpreadsheet = await removeUserAccess(
+        spreadsheetId,
+        session.user_id
+      );
+    } else {
+      deletedSpreadsheet = await deleteSpreadsheetById(spreadsheetId);
+    }
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while deleting spreadsheet",
+      err
+    );
+  }
+
+  if (!deletedSpreadsheet) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to delete spreadsheet"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(
+      new ApiResponse(deletedSpreadsheet, "Successfully deleted spreadsheet")
+    );
+});
+
+export const getAllSheets = asyncHandler(async (req, res) => {
+  const spreadsheetId = req.params.spreadsheetId;
+  let sheets;
+
+  try {
+    sheets = await fetchSheets(spreadsheetId);
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while fetching sheets",
+      err
+    );
+  }
+
+  if (!sheets) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to fetch sheets"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(sheets, "Sheets fetched successfully"));
+});
+
+export const searchSpreadsheets = asyncHandler(async (req, res) => {
+  const session = req.session;
+  const searchQuery = req.query.query || "";
+  const resultsPerPage = 20;
+  const pageOffset = (parseInt(req.query.page, 10) - 1) * resultsPerPage || 0;
+  let spreadsheets;
+
+  try {
+    spreadsheets = await searchSpreadsheetsByNames(
+      session.user_id,
+      searchQuery,
+      pageOffset,
+      resultsPerPage
+    );
+  } catch (err) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while searching spreadsheets",
+      err
+    );
+  }
+
+  if (!spreadsheets) {
+    throw new ApiError(
+      STATUS.SERVER_ERROR.SERVICE_UNAVAILABLE,
+      "Failed to search spreadsheets"
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(new ApiResponse(spreadsheets, "Successfully searched spreadsheets"));
+});
+
+export const countSpreadsheets = asyncHandler(async (req, res) => {
+  const session = req.session;
+  const searchQuery = req.query.query || "";
+  console.log("Session User ID:", session.user_id); // Debugging
+  console.log("Search Query:", searchQuery); // Debugging
+  let spreadsheetCount;
+
+  try {
+    spreadsheetCount = await getSpreadsheetCount(session.user_id, searchQuery);
+  } catch (err) {
+    console.error("Error in countSpreadsheets:", err); // Debugging
+    throw new ApiError(
+      STATUS.SERVER_ERROR.INTERNAL_SERVER_ERROR,
+      "Something went wrong while counting spreadsheets",
+      err
+    );
+  }
+
+  return res
+    .status(STATUS.SUCCESS.OK)
+    .json(
+      new ApiResponse(spreadsheetCount, "Successfully counted spreadsheets")
+    );
 });

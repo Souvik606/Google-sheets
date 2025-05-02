@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const spreadSheetBodySchema = z.object({
-  name: z.string().min(3, "Name must be at least 2 characters long."),
+  name: z
+    .string()
+    .min(3, "Name must be at least 2 characters long.")
+    .default("Untitled Spreadsheet"),
   description: z
     .string()
     .max(200, "Description can be upto 200 characters.")

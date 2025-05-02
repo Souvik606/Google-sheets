@@ -50,6 +50,30 @@ export const editSpreadsheetDescription = async (
   }
 };
 
+export const deleteSpreadsheetById = async (spreadsheetId) => {
+  try {
+    return await sql`
+    DELETE FROM spreadsheets WHERE spreadsheet_id = ${spreadsheetId}
+    RETURNING spreadsheet_id,spreadsheet_name
+    `;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const removeUserAccess = async (spreadsheetId, userId) => {
+  try {
+    await sql`
+        UPDATE sheet_access
+        SET wants = FALSE
+        WHERE sheet_id = ${spreadsheetId} AND user_id = ${userId}
+      `;
+    return { spreadsheet_id: spreadsheetId, status: "access_removed" };
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
 export const updateUserAccess = async (spreadsheetId, usersArray) => {
   console.log("usersArray", usersArray);
   try {
@@ -77,10 +101,10 @@ export const updateUserAccess = async (spreadsheetId, usersArray) => {
     // Insert into Sheet_access table
     for (const { user_id, role } of userRoleArray) {
       const result = await sql`
-        INSERT INTO Sheet_access (sheet_id, user_id, role) 
-        VALUES (${spreadsheetId}, ${user_id}, ${role})
+        INSERT INTO Sheet_access (sheet_id, user_id, role, wants) 
+        VALUES (${spreadsheetId}, ${user_id}, ${role}, TRUE)
         ON CONFLICT (sheet_id, user_id) 
-        DO UPDATE SET role = EXCLUDED.role
+        DO UPDATE SET role = EXCLUDED.role, wants = TRUE
         RETURNING *;
       `;
 
@@ -97,12 +121,95 @@ export const updateUserAccess = async (spreadsheetId, usersArray) => {
 export const getAllSpreadsheets = async (userId) => {
   try {
     return await sql`
-    SELECT * from spreadsheets where owner_id = ${userId}
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE s.owner_id = ${userId}
     UNION
-    SELECT s.* from spreadsheets s,sheet_access sa
-    WHERE sa.user_id = ${userId}
-    AND sa.sheet_id=s.spreadsheet_id;
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE sa.user_id = ${userId} AND sa.wants = TRUE
+    ORDER BY last_edited_at DESC;
     `;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+export const findAllUsers = async (spreadsheetId) => {
+  try {
+    return await sql`
+    SELECT owner_id as user_id,'editor' as role from spreadsheets WHERE spreadsheet_id = ${spreadsheetId}
+    UNION
+    SELECT user_id,role from Sheet_access WHERE sheet_id = ${spreadsheetId}
+    `;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+export const fetchSheets = async (spreadsheetId) => {
+  return sql`
+    SELECT * FROM sheets
+    WHERE spreadsheet_id = ${spreadsheetId}`;
+};
+
+export const searchSpreadsheetsByNames = async (
+  userId,
+  searchQuery,
+  offset,
+  limit
+) => {
+  try {
+    return await sql`
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE s.owner_id = ${userId}
+    AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+         OR s.description ILIKE '%' || ${searchQuery} || '%')
+    UNION
+    SELECT s.*, u.name AS owner_name
+    FROM spreadsheets s
+    JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
+    JOIN "users" u ON s.owner_id = u.user_id
+    WHERE sa.user_id = ${userId} AND sa.wants = TRUE
+    AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+         OR s.description ILIKE '%' || ${searchQuery} || '%')
+    ORDER BY last_edited_at DESC
+    LIMIT ${limit} OFFSET ${offset};
+    `;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
+
+export const getSpreadsheetCount = async (userId, searchQuery) => {
+  try {
+    const result = await sql`
+    SELECT SUM(count) AS total_count FROM (
+      SELECT COUNT(*) AS count
+      FROM spreadsheets s
+      JOIN "users" u ON s.owner_id = u.user_id
+      WHERE s.owner_id = ${userId}
+      AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+           OR s.description ILIKE '%' || ${searchQuery} || '%')
+      UNION ALL
+      SELECT COUNT(*) AS count
+      FROM spreadsheets s
+      JOIN sheet_access sa ON sa.sheet_id = s.spreadsheet_id
+      JOIN "users" u ON s.owner_id = u.user_id
+      WHERE sa.user_id = ${userId}
+      AND (s.spreadsheet_name ILIKE '%' || ${searchQuery} || '%' 
+           OR s.description ILIKE '%' || ${searchQuery} || '%')
+    ) AS counts;
+    `;
+    return result[0].total_count || 0; // Return 0 if no rows are found
   } catch (err) {
     console.log(err);
     throw err;
