@@ -1,8 +1,10 @@
-import React from "react";
+"use client";
 
-const page = async ({ params }) => {
-  const { sheetId } = await params;
+import { useParams } from "next/navigation";
+
+const SpreadSheetPage = () => {
+  const { sheetId } = useParams();
   return <div>{sheetId}</div>;
 };
 
-export default page;
+export default SpreadSheetPage;

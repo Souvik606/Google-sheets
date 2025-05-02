@@ -1,28 +1,18 @@
 "use client";
 
 import Navbar from "@/components/Navbar";
-import React, { useState } from "react";
+import { useParams } from "next/navigation";
+import api from "@/lib/api";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  CircleAlertIcon,
-  CircleCheckIcon,
   EditIcon,
   MoreVertical,
-  Plus,
   RefreshCw,
   SquareArrowOutUpRight,
   Trash2Icon,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
-import api from "@/lib/api";
-import Image from "next/image";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Pagination,
   PaginationContent,
@@ -30,47 +20,25 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-  PaginationRowsPerPage,
 } from "@/components/ui/pagination";
-
-import { RenameSpreadsheetDialog } from "@/components/RenameDialog";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/providers/AuthProvider";
 import { Tooltip } from "@/components/ui/Tooltip";
 
-export default function Home() {
+const SearchPage = () => {
   const [ownerFilter, setOwnerFilter] = useState("anyone");
-  const [showRenameDialog, setShowRenameDialog] = useState(false);
-  const [initialName, setInitialName] = useState("");
-  const [selectedSpreadsheetId, setSelectedSpreadsheetId] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
+  const { query } = useParams();
+  const decodedQuery = decodeURIComponent(query);
   const router = useRouter();
   const { auth } = useAuth();
-
+  const [currentPage, setCurrentPage] = useState(1);
   const userId = auth.user.user_id;
-
-  const { mutate: createSheet, isPending } = useMutation({
-    mutationFn: async () => {
-      const response = await api.post("/spreadsheet/create");
-      return response.data;
-    },
-    mutationKey: ["CreateSheet"],
-    onSuccess: (res) => {
-      toast(res.message, {
-        icon: <CircleCheckIcon className="text-emerald-500" />,
-        dismissible: true,
-      });
-      refetch();
-    },
-    onError: (err) => {
-      toast(err.response ? err.response.data.message : err.message, {
-        icon: <CircleAlertIcon className="text-rose-500" />,
-        dismissible: true,
-      });
-    },
-  });
 
   const {
     data: sheets,
@@ -78,62 +46,40 @@ export default function Home() {
     isSuccess: isSheetsFetched,
     isFetching: isSheetsFetching,
     refetch,
+    error,
   } = useQuery({
     queryFn: async () => {
-      const response = await api.get("/spreadsheet");
+      const response = await api.get(
+        `/spreadsheet/search?query=${decodedQuery}&page=${currentPage}`
+      );
       return response.data;
     },
-    queryKey: ["GetAllSheets"],
+    queryKey: ["searchSpreadsheetsByNames", decodedQuery, currentPage],
+    keepPreviousData: true,
   });
 
-  const { mutate: deleteSpreadSheet, isPending: isSpreadSheetDeletePending } =
-    useMutation({
-      mutationFn: async ({ spreadSheetId }) => {
-        const response = await api.delete(
-          `/spreadsheet/${spreadSheetId}/delete`
-        );
-        return response.data;
-      },
-      mutationKey: ["DeleteSpreadSheet"],
-      onSuccess: (res) => {
-        toast(res.message, {
-          icon: <CircleCheckIcon className="text-emerald-500" />,
-          dismissible: true,
-        });
-        refetch();
-      },
-      onError: (err) => {
-        toast(err.response ? err.response.data.message : err.message, {
-          icon: <CircleAlertIcon className="text-rose-500" />,
-          dismissible: true,
-        });
-      },
-    });
+  const { data: searchCount } = useQuery({
+    queryFn: async () => {
+      const response = await api.get(
+        `/spreadsheet/count?query=${decodedQuery}`
+      );
+      return response.data.data;
+    },
+    queryKey: ["getSpreadsheetCount", decodedQuery],
+  });
+
+  useEffect(() => {
+    if (error) {
+      console.error("Error fetching search results:", error);
+    }
+  }, [error]);
 
   return (
     <>
       <Navbar />
-
-      {/* New Spreadsheet */}
       <section className="mx-auto max-w-7xl px-6 pt-8">
-        <h2 className="text-center text-xl font-bold text-gray-800 dark:text-gray-200">
-          Start a new spreadsheet
-        </h2>
-        <div className="flex items-center justify-center pt-3">
-          <Button
-            onClick={createSheet}
-            disabled={isPending}
-            className="flex h-35 w-45 cursor-pointer items-center justify-center rounded-sm border-2 bg-white text-teal-700 shadow-md !transition-none hover:border-teal-300 hover:bg-teal-50 hover:text-teal-900 hover:shadow-lg dark:border-gray-700 dark:bg-zinc-800 dark:text-cyan-500 dark:hover:border-teal-50/70 dark:hover:bg-zinc-900 dark:hover:text-cyan-300"
-          >
-            <Plus className="size-10 h-3/4 w-3/4 object-contain !transition-none hover:text-cyan-300" />
-          </Button>
-        </div>
-      </section>
-
-      {/* Sheets List */}
-      <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="flex items-center justify-between pb-8 text-gray-700 dark:text-gray-300">
-          <h2 className="text-xl font-bold">My Sheets</h2>
+          <h2 className="text-xl font-bold">Search results: {decodedQuery}</h2>
         </div>
         <div className="flex items-center bg-teal-50 px-4 py-1 text-lg text-gray-600 dark:bg-slate-800/50 dark:text-gray-400">
           <span className="flex-1 font-semibold">Name</span>
@@ -143,24 +89,9 @@ export default function Home() {
               onChange={(e) => setOwnerFilter(e.target.value)}
               className="cursor-pointer rounded-lg px-0 py-2 font-semibold focus:outline-none"
             >
-              <option
-                value="anyone"
-                className="dark:focus-visible::bg-slate-800 dark:bg-zinc-700 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:text-white"
-              >
-                Owned by anyone
-              </option>
-              <option
-                value="me"
-                className="dark:focus-visible::bg-slate-800 dark:bg-zinc-700 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:text-white"
-              >
-                Owned by me
-              </option>
-              <option
-                value="not-me"
-                className="dark:focus-visible::bg-slate-800 dark:bg-zinc-700 dark:text-gray-200 dark:hover:bg-slate-800 dark:focus:text-white"
-              >
-                Not owned by me
-              </option>
+              <option value="anyone">Owned by anyone</option>
+              <option value="me">Owned by me</option>
+              <option value="not-me">Not owned by me</option>
             </select>
           </span>
           <span className="w-1/4 font-semibold">Last edited</span>
@@ -170,7 +101,9 @@ export default function Home() {
               className="cursor-pointer rounded-full px-0.5"
             >
               <RefreshCw
-                className={`size-5 !transition-none hover:text-green-700 ${isSheetsFetching && "animate-spin"}`}
+                className={`size-5 !transition-none hover:text-green-700 ${
+                  isSheetsFetching && "animate-spin"
+                }`}
               />
             </button>
           </Tooltip>
@@ -179,6 +112,10 @@ export default function Home() {
           {isSheetsFetchLoading ? (
             <p className="text-lg text-gray-500 dark:text-gray-400">
               Loading...
+            </p>
+          ) : error ? (
+            <p className="text-lg text-red-500 dark:text-red-400">
+              Failed to load search results.
             </p>
           ) : (
             isSheetsFetched && (
@@ -192,10 +129,6 @@ export default function Home() {
                     }
                     return true;
                   })
-                  .slice(
-                    (currentPage - 1) * rowsPerPage,
-                    currentPage * rowsPerPage
-                  )
                   .map((item) => (
                     <div
                       key={item.spreadsheet_id}
@@ -287,11 +220,6 @@ export default function Home() {
                     </div>
                   ))}
                 <Pagination className="mt-4">
-                  <PaginationRowsPerPage
-                    rowsPerPage={rowsPerPage}
-                    setRowsPerPage={setRowsPerPage}
-                    className="mr-2"
-                  />
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
@@ -302,16 +230,7 @@ export default function Home() {
                       />
                     </PaginationItem>
                     {Array.from({
-                      length: Math.ceil(
-                        sheets.data.filter((sheet) => {
-                          if (ownerFilter === "me") {
-                            return sheet.owner_id === userId;
-                          } else if (ownerFilter === "not-me") {
-                            return sheet.owner_id !== userId;
-                          }
-                          return true;
-                        }).length / rowsPerPage
-                      ),
+                      length: Math.ceil(searchCount / 20),
                     }).map((_, index) => (
                       <PaginationItem key={index}>
                         <PaginationLink
@@ -328,19 +247,7 @@ export default function Home() {
                         href="#"
                         onClick={() =>
                           setCurrentPage((prev) =>
-                            Math.min(
-                              prev + 1,
-                              Math.ceil(
-                                sheets.data.filter((sheet) => {
-                                  if (ownerFilter === "me") {
-                                    return sheet.owner_id === userId;
-                                  } else if (ownerFilter === "not-me") {
-                                    return sheet.owner_id !== userId;
-                                  }
-                                  return true;
-                                }).length / rowsPerPage
-                              )
-                            )
+                            Math.min(prev + 1, Math.ceil(searchCount / 20))
                           )
                         }
                       />
@@ -352,14 +259,8 @@ export default function Home() {
           )}
         </div>
       </section>
-
-      <RenameSpreadsheetDialog
-        open={showRenameDialog}
-        onOpenChange={setShowRenameDialog}
-        initialName={initialName}
-        sheetId={selectedSpreadsheetId}
-        onRenameSuccess={refetch}
-      />
     </>
   );
-}
+};
+
+export default SearchPage;

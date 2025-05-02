@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { Loader } from "lucide-react";
 
@@ -114,7 +114,6 @@ export const AuthProvider = ({ children }) => {
       router.push("/login");
     } else {
       setAuth({ ...storedAuth, loading: false });
-      setTimeout(() => redirect("/"), 500);
     }
   }, [router]);
 
